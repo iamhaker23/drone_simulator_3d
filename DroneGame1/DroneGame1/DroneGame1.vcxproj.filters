@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\engine">
+      <UniqueIdentifier>{88a1459b-6884-454a-945c-7255042fd305}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\engine">
+      <UniqueIdentifier>{47a36eb6-7a7f-4518-bd1b-314db531722c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib">
+      <UniqueIdentifier>{85282bd8-b3da-4d4b-b555-b1b8338e970b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine\glm">
+      <UniqueIdentifier>{1ea8c528-4443-49fe-9621-261bfeb45845}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine\gl">
+      <UniqueIdentifier>{54517aba-9a07-4152-83aa-e14630dfaf12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\engine\shaders">
+      <UniqueIdentifier>{86436fee-7634-4da1-a88a-79ecaa599a57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\Images">
+      <UniqueIdentifier>{5a61d3a9-39ee-4298-ab21-64842ca8dab6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\Obj">
+      <UniqueIdentifier>{9cffb7b7-b09f-4a17-a904-3d1a778cfc24}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\3dStruct">
+      <UniqueIdentifier>{035f0b39-f966-4abd-b373-f3cbbe6beee0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\Octree">
+      <UniqueIdentifier>{8ea5d6e7-7124-47d4-a4e7-a82267fd02ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\Structures">
+      <UniqueIdentifier>{c7d99331-0989-47d2-898f-99f6a9d6d24b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\TextureHandler">
+      <UniqueIdentifier>{313e0010-2476-4d89-80b0-f194cf3e34ad}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\lib\Utilities">
+      <UniqueIdentifier>{536d5e5d-2c30-4f7f-a0a3-27d99b278f49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib">
+      <UniqueIdentifier>{4bfe96bc-1498-436f-bddc-d5d7275da547}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\Images">
+      <UniqueIdentifier>{d9ff011e-ebc4-44d6-916f-230de50f3523}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\3dStruct">
+      <UniqueIdentifier>{32ab0304-dc3e-46a1-a64d-6a0894c146db}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\Utilities">
+      <UniqueIdentifier>{fc8bb8a3-8aaa-4d83-867f-130c3a1b6ad7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\TextureHandler">
+      <UniqueIdentifier>{23e9c893-b02d-4be4-89b2-b3c1fb57b232}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\Octree">
+      <UniqueIdentifier>{ef0e58d4-fa85-4570-90cc-d61fdafd880c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\Obj">
+      <UniqueIdentifier>{e4b822b3-8c5f-408d-b3d8-6746e28000e0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\lib\Structures">
+      <UniqueIdentifier>{c5615783-bee8-4e05-b924-ca3fe4d2ed0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\engine\shader">
+      <UniqueIdentifier>{0c6638b3-71fd-464f-ab91-38eca779006d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\a3DGameEngine.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\aGameEngine.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\aInputManager.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\aSceneManager.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\gl\glew.h">
+      <Filter>Header Files\engine\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\gl\glxew.h">
+      <Filter>Header Files\engine\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\gl\wglew.h">
+      <Filter>Header Files\engine\gl</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\glm\ext.hpp">
+      <Filter>Header Files\engine\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\glm\glm.hpp">
+      <Filter>Header Files\engine\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\shaders\Shader.h">
+      <Filter>Header Files\engine\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="resource1.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Scene.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Obj\OBJLoader.h">
+      <Filter>Header Files\lib\Obj</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Images\imageloader.h">
+      <Filter>Header Files\lib\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Images\nvImage.h">
+      <Filter>Header Files\lib\Images</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\3dStruct\BoundingBox.h">
+      <Filter>Header Files\lib\3dStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\3dStruct\threeDModel.h">
+      <Filter>Header Files\lib\3dStruct</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Octree\Octree.h">
+      <Filter>Header Files\lib\Octree</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Structures\Vector2d.h">
+      <Filter>Header Files\lib\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Structures\Vector3d.h">
+      <Filter>Header Files\lib\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Utilities\IntersectionTests.h">
+      <Filter>Header Files\lib\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Utilities\Lighting.h">
+      <Filter>Header Files\lib\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\TextureHandler\TextureHandler.h">
+      <Filter>Header Files\lib\TextureHandler</Filter>
+    </ClInclude>
+    <ClInclude Include="lib\Box.h">
+      <Filter>Header Files\lib</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DroneGame1.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\a3DGameEngine.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\aGameEngine.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\aInputManager.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\aSceneManager.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Scene.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\shaders\Shader.cpp">
+      <Filter>Source Files\engine\shader</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Images\imageLoaderPNG.cpp">
+      <Filter>Source Files\lib\Images</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\3dStruct\BoundingBox.cpp">
+      <Filter>Source Files\lib\3dStruct</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\3dStruct\threeDModel.cpp">
+      <Filter>Source Files\lib\3dStruct</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Utilities\IntersectionTests.cpp">
+      <Filter>Source Files\lib\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\TextureHandler\TextureHandler.cpp">
+      <Filter>Source Files\lib\TextureHandler</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Octree\Octree.cpp">
+      <Filter>Source Files\lib\Octree</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Obj\OBJLoader.cpp">
+      <Filter>Source Files\lib\Obj</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Structures\Vector2d.cpp">
+      <Filter>Source Files\lib\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Structures\Vector3d.cpp">
+      <Filter>Source Files\lib\Structures</Filter>
+    </ClCompile>
+    <ClCompile Include="lib\Box.cpp">
+      <Filter>Source Files\lib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DroneGame11.rc" />
+  </ItemGroup>
+</Project>
