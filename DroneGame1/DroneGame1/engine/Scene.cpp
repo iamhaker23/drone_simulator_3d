@@ -58,3 +58,7 @@ int Scene::addObject(GameObject* toAdd) {
 	objects.push_back(toAdd);
 	return objects.size() - 1;
 }
+
+vector<GameObject*> Scene::getGameObjects() {
+	return this->objects;
+}

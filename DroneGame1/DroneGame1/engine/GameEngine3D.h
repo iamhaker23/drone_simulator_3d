@@ -21,6 +21,7 @@ private:
 	//TODO: Refactor
 	float amount = 0;
 	float temp = 0.5f;
+	Scene* current_scene;
 
 public:
 	GameEngine3D();

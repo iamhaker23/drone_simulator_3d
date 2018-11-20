@@ -11,6 +11,7 @@ protected:
 	SceneManager* scene_manager;
 	InputManager* input_manager;
 	float clearColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f};
+	
 
 public:
 

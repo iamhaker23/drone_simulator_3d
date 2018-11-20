@@ -22,5 +22,6 @@ public:
 	int addCamera(Camera cam, bool activate);
 	int addObject(GameObject* toAdd);
 	void setActiveCamera(int idx);
+	vector<GameObject*> getGameObjects();
 
 };

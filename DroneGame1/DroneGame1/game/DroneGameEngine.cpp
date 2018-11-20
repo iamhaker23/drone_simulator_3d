@@ -22,6 +22,8 @@ void DroneGameEngine::init() {
 
 	myScene->addObject(new GameObject("Drone1", "Assets/models/drone-1.obj", "Assets/glslfiles/basicTransformations"));
 
+	myScene->addObject(new GameObject("Drone1", "Assets/models/tardis_1.obj", "Assets/glslfiles/basicTransformations"));
+
 	scene_manager->addScene(myScene, true);
 
 }

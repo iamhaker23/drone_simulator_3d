@@ -41,3 +41,10 @@ void SceneManager::resizeCameras(GLfloat width, GLfloat height) {
 		scenes[i]->resizeCameras(width, height);
 	}
 }
+
+Scene* SceneManager::getActiveScene() {
+	if (this->activeScene != -1 && this->activeScene < (int)this->scenes.size()) {
+		return this->scenes[this->activeScene];
+	}
+	return NULL;
+}
