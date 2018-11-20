@@ -79,13 +79,13 @@ public:
 	//default constructor
 	OBJLoader();
 
-	bool loadModel(char * fileName, ThreeDModel& theResult);
+	bool loadModel(const char * fileName, ThreeDModel& theResult);
 
 private:
-	bool internalLoadModel(char * fileName);
+
 	void readTriangleFaceVertTexNorm(char *line, int matId);
 	void readFaceLine(FILE * theFile, int matId);
-	bool myFileLoader(char *filename);
+	bool myFileLoader(const char *filename);
 	bool myMTLLoader(const char *mainName, const char *filename);
 	int lookupMaterial(char *matName);
 	void splitFrontString(char * inputString, char * frontString, char * restString, int size);

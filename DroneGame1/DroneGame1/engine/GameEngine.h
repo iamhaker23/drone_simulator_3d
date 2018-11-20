@@ -1,29 +1,30 @@
 #pragma once
 
-#include "aSceneManager.h"
-#include "aInputManager.h"
+#include "SceneManager.h"
+#include "InputManager.h"
 
-class aGameEngine {
+class GameEngine {
 	
 protected:
 	int screenWidth;
 	int screenHeight;
-	aSceneManager* scene_manager;
-	aInputManager* input_manager;
+	SceneManager* scene_manager;
+	InputManager* input_manager;
+	float clearColorRGBA[4] = { 0.0f, 0.0f, 0.0f, 0.0f};
 
 public:
 
-	aGameEngine();
-	aGameEngine(const aGameEngine &copy);
-	~aGameEngine();
+	GameEngine();
+	GameEngine(const GameEngine &copy);
+	~GameEngine();
 
 	virtual void processKeys() = 0;
 	virtual void draw() = 0;
 	virtual void init() = 0;
 	virtual void update() = 0;
 	virtual void resize(int width, int height) = 0;
-	aSceneManager* getSceneManager();
-	aInputManager* getInputManager();
+	SceneManager* getSceneManager();
+	InputManager* getInputManager();
 
 	int getScreenWidth();
 	int getScreenHeight();

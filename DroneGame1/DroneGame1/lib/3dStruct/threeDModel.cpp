@@ -803,7 +803,7 @@ void ThreeDModel::drawElementsUsingVBO(Shader* myShader)
 		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 		
 		//std::cout << " length " << length[i] << " " << length[i+1] << " " << length[i+2] << std::endl;
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer[4+(i/3)]);
+		//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer[4+(i/3)]);
 		
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDrawElements(GL_TRIANGLES, (length[i+1]-length[i]+3), GL_UNSIGNED_INT, 0);

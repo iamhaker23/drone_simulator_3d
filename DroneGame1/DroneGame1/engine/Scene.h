@@ -1,10 +1,14 @@
 #pragma once
 
 #include <iostream>
+#include "GameObject.h"
+#include "Cameras.h"
 
 class Scene {
 private:
+	int activeCamera = -1;
 	std::string scene_name;
+	vector<GameObject*> objects;
 
 public:
 
@@ -13,4 +17,10 @@ public:
 	~Scene();
 
 	std::string getName();
+	void resizeCameras(GLfloat newAspect);
+	void draw();
+	int addCamera(Camera cam, bool activate);
+	int addObject(GameObject* toAdd);
+	void setActiveCamera(int idx);
+
 };

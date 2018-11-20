@@ -92,10 +92,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="engine\a3DGameEngine.h" />
-    <ClInclude Include="engine\aGameEngine.h" />
-    <ClInclude Include="engine\aInputManager.h" />
-    <ClInclude Include="engine\aSceneManager.h" />
+    <ClInclude Include="engine\Camera.h" />
+    <ClInclude Include="engine\Cameras.h" />
+    <ClInclude Include="engine\GameEngine3D.h" />
+    <ClInclude Include="engine\GameEngine.h" />
+    <ClInclude Include="engine\GameObject.h" />
+    <ClInclude Include="engine\InputManager.h" />
+    <ClInclude Include="engine\SceneManager.h" />
     <ClInclude Include="engine\glm\ext.hpp" />
     <ClInclude Include="engine\glm\glm.hpp" />
     <ClInclude Include="engine\gl\glew.h" />
@@ -103,6 +106,7 @@
     <ClInclude Include="engine\gl\wglew.h" />
     <ClInclude Include="engine\Scene.h" />
     <ClInclude Include="engine\shaders\Shader.h" />
+    <ClInclude Include="game\DroneGameEngine.h" />
     <ClInclude Include="lib\3dStruct\BoundingBox.h" />
     <ClInclude Include="lib\3dStruct\threeDModel.h" />
     <ClInclude Include="lib\Box.h" />
@@ -120,12 +124,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DroneGame1.cpp" />
-    <ClCompile Include="engine\a3DGameEngine.cpp" />
-    <ClCompile Include="engine\aGameEngine.cpp" />
-    <ClCompile Include="engine\aInputManager.cpp" />
-    <ClCompile Include="engine\aSceneManager.cpp" />
+    <ClCompile Include="engine\Camera.cpp" />
+    <ClCompile Include="engine\Cameras.cpp" />
+    <ClCompile Include="engine\GameEngine3D.cpp" />
+    <ClCompile Include="engine\GameEngine.cpp" />
+    <ClCompile Include="engine\GameObject.cpp" />
+    <ClCompile Include="engine\InputManager.cpp" />
+    <ClCompile Include="engine\SceneManager.cpp" />
     <ClCompile Include="engine\Scene.cpp" />
     <ClCompile Include="engine\shaders\Shader.cpp" />
+    <ClCompile Include="game\DroneGameEngine.cpp" />
     <ClCompile Include="lib\3dStruct\BoundingBox.cpp" />
     <ClCompile Include="lib\3dStruct\threeDModel.cpp" />
     <ClCompile Include="lib\Box.cpp" />

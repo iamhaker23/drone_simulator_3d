@@ -75,22 +75,16 @@
     <Filter Include="Source Files\engine\shader">
       <UniqueIdentifier>{0c6638b3-71fd-464f-ab91-38eca779006d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\game">
+      <UniqueIdentifier>{e810638f-1243-4176-a7ae-4a6f4fb877cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\game">
+      <UniqueIdentifier>{ccbf9d0e-d5ec-45b1-bd3f-b71e5c1e7a23}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\a3DGameEngine.h">
-      <Filter>Header Files\engine</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\aGameEngine.h">
-      <Filter>Header Files\engine</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\aInputManager.h">
-      <Filter>Header Files\engine</Filter>
-    </ClInclude>
-    <ClInclude Include="engine\aSceneManager.h">
-      <Filter>Header Files\engine</Filter>
     </ClInclude>
     <ClInclude Include="engine\gl\glew.h">
       <Filter>Header Files\engine\gl</Filter>
@@ -152,6 +146,30 @@
     <ClInclude Include="lib\Box.h">
       <Filter>Header Files\lib</Filter>
     </ClInclude>
+    <ClInclude Include="engine\GameEngine.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\InputManager.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\SceneManager.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\GameEngine3D.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\GameObject.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Cameras.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="engine\Camera.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
+    <ClInclude Include="game\DroneGameEngine.h">
+      <Filter>Header Files\game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DroneGame1.cpp">
@@ -159,18 +177,6 @@
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\a3DGameEngine.cpp">
-      <Filter>Source Files\engine</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\aGameEngine.cpp">
-      <Filter>Source Files\engine</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\aInputManager.cpp">
-      <Filter>Source Files\engine</Filter>
-    </ClCompile>
-    <ClCompile Include="engine\aSceneManager.cpp">
-      <Filter>Source Files\engine</Filter>
     </ClCompile>
     <ClCompile Include="engine\Scene.cpp">
       <Filter>Source Files\engine</Filter>
@@ -207,6 +213,30 @@
     </ClCompile>
     <ClCompile Include="lib\Box.cpp">
       <Filter>Source Files\lib</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GameEngine3D.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GameEngine.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\InputManager.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\SceneManager.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\GameObject.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Cameras.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="engine\Camera.cpp">
+      <Filter>Source Files\engine</Filter>
+    </ClCompile>
+    <ClCompile Include="game\DroneGameEngine.cpp">
+      <Filter>Source Files\game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

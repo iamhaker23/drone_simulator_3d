@@ -1,6 +1,6 @@
 #pragma once
 
-class aInputManager {
+class InputManager {
 private:
 	bool leftMouseButton;
 	
@@ -14,9 +14,9 @@ private:
 
 public:
 
-	aInputManager();
-	aInputManager(const aInputManager &copy);
-	~aInputManager();
+	InputManager();
+	InputManager(const InputManager &copy);
+	~InputManager();
 
 	void setLeftMouseButton(bool clicked);
 	void setInputActivated(int index, int value);

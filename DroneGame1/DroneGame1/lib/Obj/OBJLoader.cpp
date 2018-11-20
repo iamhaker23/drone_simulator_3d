@@ -13,7 +13,7 @@ OBJLoader::OBJLoader()
 	m_bHasNormals = false;
 }
 
-bool OBJLoader::loadModel(char * fileName, ThreeDModel& theResult)
+bool OBJLoader::loadModel(const char * fileName, ThreeDModel& theResult)
 {	
 	m_vVertices.clear();
 	m_vNormals.clear();
@@ -400,7 +400,7 @@ int OBJLoader::lookupMaterial(char *matName)
 	return -1;
 }
 
-bool OBJLoader::myFileLoader(char *filename)
+bool OBJLoader::myFileLoader(const char *filename)
 {
 	char line[255];
 
