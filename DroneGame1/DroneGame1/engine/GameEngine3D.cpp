@@ -86,8 +86,7 @@ void GameEngine3D::resize(int width, int height)
 	this->screenHeight = height;
 
 	glViewport(0, 0, width, height);						// Reset The Current Viewport
-
-	GLfloat newAspect = (GLfloat)width / (GLfloat)height;
-	
+		
+	scene_manager->resizeCameras(width, height);
 	
 }

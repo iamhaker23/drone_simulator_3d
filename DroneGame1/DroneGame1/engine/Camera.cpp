@@ -32,12 +32,22 @@ Camera::~Camera() {
 Camera::Camera(const Camera &copy) {
 	this->modelViewMatrix = copy.modelViewMatrix;
 	this->projectionMatrix = copy.projectionMatrix;
+
+	this->farPlane = copy.farPlane;
+	this->nearPlane = copy.nearPlane;
+	this->fov = copy.fov;
+	this->aspect = copy.aspect;
+
+	//update the aspect?
+	this->updateOnResize = copy.updateOnResize;
+
 }
 
-void Camera::resize(GLfloat newAspect) {
+void Camera::resize(GLfloat width, GLfloat height) {
 	//Set the projection matrix
 	if (this->updateOnResize){
-		this->projectionMatrix = glm::perspective(fov, newAspect, nearPlane, farPlane);
-	}
 
+		this->projectionMatrix = glm::perspective(fov, (GLfloat)width/height, nearPlane, farPlane);
+	}
+	
 }

@@ -26,6 +26,6 @@ public:
 	Camera(GLfloat fov, GLfloat aspect, GLfloat nearPlane, GLfloat farPlane, bool updateOnResize);
 	~Camera();
 	Camera(const Camera &copy);
-	void resize(GLfloat newAspect);
+	void resize(GLfloat width, GLfloat height);
 
 };

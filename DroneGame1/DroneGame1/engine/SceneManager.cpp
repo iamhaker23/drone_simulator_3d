@@ -35,3 +35,9 @@ void SceneManager::drawActive() {
 		scenes[activeScene]->draw();
 	}
 }
+
+void SceneManager::resizeCameras(GLfloat width, GLfloat height) {
+	for (int i = 0; i < (int)scenes.size(); i++) {
+		scenes[i]->resizeCameras(width, height);
+	}
+}

@@ -17,7 +17,7 @@ public:
 	~Scene();
 
 	std::string getName();
-	void resizeCameras(GLfloat newAspect);
+	void resizeCameras(GLfloat width, GLfloat height);
 	void draw();
 	int addCamera(Camera cam, bool activate);
 	int addObject(GameObject* toAdd);

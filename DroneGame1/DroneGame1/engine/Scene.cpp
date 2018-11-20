@@ -38,9 +38,9 @@ std::string Scene::getName()
 	return this->scene_name;
 }
 
-void Scene::resizeCameras(GLfloat newAspect) {
+void Scene::resizeCameras(GLfloat width, GLfloat height) {
 	for (int i = 0; i < (int)Cameras::cameras.size(); i++) {
-		Cameras::cameras[i].resize(newAspect);
+		Cameras::cameras[i].resize(width, height);
 	}
 }
 
