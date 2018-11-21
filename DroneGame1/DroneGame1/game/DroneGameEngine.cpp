@@ -17,13 +17,27 @@ void DroneGameEngine::init() {
 		
 	
 	Scene* myScene = new Scene();
+	
+	GameObject* drone = new GameObject("Drone1", "Assets/models/drone-1.obj", "Assets/glslfiles/basicTransformations", false);
+	GameObject* tardis = new GameObject("Tardis", "Assets/models/tardis_1.obj", "Assets/glslfiles/basicTransformations", true);
 
-	myScene->addCamera(Camera(), true);
+	GLfloat currentAspect = (GLfloat)(screenWidth / screenHeight);
+	Camera camera1 = Camera(20.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
+	Camera camera2 = Camera(40.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
+	Camera camera3 = Camera(60.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
 
-	myScene->addObject(new GameObject("Drone1", "Assets/models/drone-1.obj", "Assets/glslfiles/basicTransformations"));
+	myScene->addCamera(camera1, true);
+	myScene->addCamera(camera2, false);
+	myScene->addCamera(camera3, false);
 
-	myScene->addObject(new GameObject("Drone1", "Assets/models/tardis_1.obj", "Assets/glslfiles/basicTransformations"));
+	
+	myScene->addObject(drone);
+	myScene->addObject(tardis);
+	
+	tardis->parent = drone;
 
 	scene_manager->addScene(myScene, true);
+
+	input_manager->cooldown_config[VK_NUMPAD0] = 100;
 
 }

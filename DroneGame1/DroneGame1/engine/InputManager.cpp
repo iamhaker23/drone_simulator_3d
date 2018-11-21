@@ -14,7 +14,20 @@ void InputManager::setInputActivated(int index, bool activated)
 
 bool InputManager::isInputActivated(int index)
 {
-	return (index >= 0 && index < this->inputs_length) ? this->inputs[index] : false;
+	bool positive = this->inputs[index];
+	
+	//cooldown enabled
+	bool enabled = (index >= 0 && index < this->inputs_length) ? (current_cooldown[index]) <= 0 : false;
+	bool pressed = (index >= 0 && index < this->inputs_length) ? this->inputs[index] : false;
+	if (enabled) {
+		if (pressed) {
+			current_cooldown[index] = cooldown_config[index];
+			return true;
+		}
+	}
+	current_cooldown[index] = current_cooldown[index] - 1;
+	return false;
+
 }
 
 void InputManager::setCursorPosition(int x, int y)

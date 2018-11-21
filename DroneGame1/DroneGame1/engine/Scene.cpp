@@ -49,8 +49,11 @@ void Scene::draw() {
 		return;
 	}
 	
+	Cameras::cameras[activeCamera].targetPos = glm::vec3(objects[0]->worldX, objects[0]->worldY, objects[0]->worldZ);
+	Cameras::cameras[activeCamera].updateTransformation();
+
 	for (int i = 0; i < (int)objects.size(); i++) {
-		objects[i]->draw(Cameras::cameras[activeCamera].projectionMatrix);
+		objects[i]->draw(Cameras::cameras[activeCamera].projectionMatrix, Cameras::cameras[activeCamera].viewMatrix);
 	}
 }
 
@@ -62,3 +65,23 @@ int Scene::addObject(GameObject* toAdd) {
 vector<GameObject*> Scene::getGameObjects() {
 	return this->objects;
 }
+
+void Scene::nextCamera() {
+	activeCamera = activeCamera + 1;
+	if (activeCamera >= (int)Cameras::cameras.size()) activeCamera = 0;
+}
+
+void Scene::setCameraTargetTrack(bool tracking) {
+	Cameras::cameras[activeCamera].trackTarget = tracking;
+}
+void Scene::setCameraPosition(float x, float y, float z){
+	Cameras::cameras[activeCamera].camPosX = x;
+	Cameras::cameras[activeCamera].camPosY = y;
+	Cameras::cameras[activeCamera].camPosZ = z;
+}
+void Scene::setCameraRotation(float x, float y, float z){
+	Cameras::cameras[activeCamera].camRotX = x;
+	Cameras::cameras[activeCamera].camRotY = y;
+	Cameras::cameras[activeCamera].camRotZ = z;
+}
+

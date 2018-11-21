@@ -23,5 +23,9 @@ public:
 	int addObject(GameObject* toAdd);
 	void setActiveCamera(int idx);
 	vector<GameObject*> getGameObjects();
-
+	void nextCamera();
+	
+	void setCameraTargetTrack(bool tracking);
+	void setCameraPosition(float x, float y, float z);
+	void setCameraRotation(float x, float y, float z);
 };

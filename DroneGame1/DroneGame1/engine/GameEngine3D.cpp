@@ -55,53 +55,53 @@ void GameEngine3D::processKeys()
 	float localX = 0, localY = 0, localZ = 0;
 	if (input_manager->isInputActivated(WKEY))
 	{
-		worldZ += 0.01f;
+		localZ += 0.01f;
 	}
 	if (input_manager->isInputActivated(SKEY))
 	{
-		worldZ += -0.01f;
+		localZ += -0.01f;
 	}
 	if (input_manager->isInputActivated(AKEY))
 	{
-		worldX += 0.01f;
+		localX += 0.01f;
 	}
 	if (input_manager->isInputActivated(DKEY))
 	{
-		worldX += -0.01f;
+		localX += -0.01f;
 	}
 	if (input_manager->isInputActivated(QKEY))
 	{
-		worldY += 0.01f;
+		localY += 0.01f;
 	}
 	if (input_manager->isInputActivated(EKEY))
 	{
-		worldY += -0.01f;
+		localY += -0.01f;
 	}
 
 
 	if (input_manager->isInputActivated(VK_NUMPAD8))
 	{
-		localZ += 0.01f;
+		worldZ += 0.01f;
 	}
 	if (input_manager->isInputActivated(VK_NUMPAD2))
 	{
-		localZ += -0.01f;
+		worldZ += -0.01f;
 	}
 	if (input_manager->isInputActivated(VK_NUMPAD4))
 	{
-		localX += 0.01f;
+		worldX += 0.01f;
 	}
 	if (input_manager->isInputActivated(VK_NUMPAD6))
 	{
-		localX += -0.01f;
+		worldX += -0.01f;
 	}
 	if (input_manager->isInputActivated(VK_NUMPAD7))
 	{
-		localY += 0.01f;
+		worldY += 0.01f;
 	}
 	if (input_manager->isInputActivated(VK_NUMPAD9))
 	{
-		localY += -0.01f;
+		worldY += -0.01f;
 	}
 
 	bool drawDebug = input_manager->isInputActivated(VK_F1);
@@ -125,8 +125,21 @@ void GameEngine3D::processKeys()
 		firstObject->drawBounds = drawDebug;
 		firstObject->drawOctree = drawDebug;
 
+		if (input_manager->isInputActivated(VK_NUMPAD0)){
+			current_scene->nextCamera();
+		}
+		
+		if (input_manager->isInputActivated(VK_TAB)) {
+			current_scene->setCameraTargetTrack(true);
+		}
+		else {
+			//current_scene->setCameraRotation(spinXinc, spinYinc, spinZinc);
+			//current_scene->setCameraPosition(localX, localY, localZ);
+		}
+
 	}
 	
+
 }
 
 void GameEngine3D::draw()

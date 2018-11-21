@@ -19,9 +19,7 @@ private:
 
 	static OBJLoader objLoader;
 
-	glm::mat4 objectRotation;
-	glm::quat q;
-	glm::mat4 modelViewMatrix;
+	glm::mat4 worldRotation;
 
 	//load once
 	static vector<Shader*> shaderList;
@@ -42,6 +40,11 @@ private:
 
 public:
 
+	glm::mat4 worldPositionMatrix;
+	glm::mat4 modelViewMatrix;
+	GameObject* parent;
+	bool inheritRotation = false;
+
 	float spinXinc = 0, spinYinc = 0, spinZinc = 0;
 	float worldX = 0, worldY = 0, worldZ = 0;
 	float localX = 0, localY = 0, localZ = 0;
@@ -50,13 +53,14 @@ public:
 	string name;
 
 	GameObject();
-	GameObject(string name, string modelPath, string shaderPath);
+	GameObject(string name, string modelPath, string shaderPath, bool inheritRotation);
 	~GameObject();
 	GameObject(const GameObject &copy);
 
-	void updateTransformation();
 	int doModelLoad(string modelPath);
 	int doShaderLoad(string shaderPath);
+	glm::mat4 getRotationMatrix(float xRot, float yRot, float zRot);
+	void updateTransformation(glm::mat4 viewMatrix);
 
 	static void clearResources() {
 
@@ -69,6 +73,6 @@ public:
 		}
 	}
 
-	void draw(glm::mat4 projectionMatrix);
+	void draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
 
 };
