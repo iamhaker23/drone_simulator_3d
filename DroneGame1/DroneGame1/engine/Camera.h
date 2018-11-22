@@ -22,7 +22,7 @@ private:
 public:
 
 	bool trackTarget = false;
-	glm::vec3 targetPos;
+	GameObject* target;
 	glm::vec3 up;
 	float fov;
 

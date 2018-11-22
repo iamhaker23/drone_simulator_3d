@@ -11,6 +11,7 @@
 
 #include "../lib/3DStruct/threeDModel.h"
 #include "../lib/Obj/OBJLoader.h"
+#include "Physics.h"
 
 #include <map>
 
@@ -39,11 +40,12 @@ private:
 	float LightPos[4] = { 0.0f, 5.0f, 10.0f, 0.0f };
 
 public:
-
+	float slowParentFactor;
 	glm::mat4 worldPositionMatrix;
 	glm::mat4 modelViewMatrix;
 	GameObject* parent;
 	bool inheritRotation = false;
+	Physics* physicsSettings;
 
 	float spinXinc = 0, spinYinc = 0, spinZinc = 0;
 	float worldX = 0, worldY = 0, worldZ = 0;
@@ -74,5 +76,6 @@ public:
 	}
 
 	void draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
-
+	void addForce(float x, float y, float z);
+	void doCollisionsAndApplyForces();
 };

@@ -11,7 +11,7 @@ Camera::Camera() : GameObject(){
 	this->updateOnResize = true;
 	this->projectionMatrix = glm::perspective(fov, aspect, nearPlane, farPlane);
 
-	this->targetPos = glm::vec3(0.f, 0.f, -10.f);
+	this->target = NULL;
 	this->up = glm::vec3(0.f, 1.f, 0.f);
 	this->parent = NULL;
 }
@@ -26,7 +26,7 @@ Camera::Camera(GLfloat fov, GLfloat aspect, GLfloat nearPlane, GLfloat farPlane,
 
 	this->projectionMatrix = glm::perspective(fov, aspect, nearPlane, farPlane);
 
-	this->targetPos = glm::vec3(0.f, 0.f, -10.f);
+	this->target = NULL;
 	this->up = glm::vec3(0.f, 1.f, 0.f);
 	this->parent = parent;
 }
@@ -47,7 +47,7 @@ Camera::Camera(const Camera &copy) : GameObject(copy) {
 	//update the aspect?
 	this->updateOnResize = copy.updateOnResize;
 
-	this->targetPos = copy.targetPos;
+	this->target = copy.target;
 	this->up = copy.up;
 	this->parent = copy.parent;
 }
@@ -62,21 +62,15 @@ void Camera::resize(GLfloat width, GLfloat height) {
 }
 
 void Camera::updateCameraTransformation() {
-	
-	/*
-	if (trackTarget) {
-		trackTarget = false;
-
-		glm::mat4 eyeSpaceTarget = glm::translate(glm::mat4(1), targetPos) * glm::inverse(modelViewMatrix);
-
-		modelViewMatrix = glm::lookAt(glm::vec3(modelViewMatrix[3][0], modelViewMatrix[3][1], modelViewMatrix[3][2]), 
-			glm::vec3(eyeSpaceTarget[3][0], eyeSpaceTarget[3][1], eyeSpaceTarget[3][2]), up);
-	}
-	*/
 
 	GameObject::updateTransformation();
-	
-	
+
+	if (trackTarget && target != NULL) {
+		
+		glm::vec3 targetPos = glm::vec3(target->modelViewMatrix[3][0], target->modelViewMatrix[3][1], target->modelViewMatrix[3][2]);
+		modelViewMatrix = glm::inverse(glm::lookAt(glm::vec3(modelViewMatrix[3][0], modelViewMatrix[3][1], modelViewMatrix[3][2]), targetPos, up));
+	}
+		
 }
 
 void Camera::addFovDelta(float fovDelta) {

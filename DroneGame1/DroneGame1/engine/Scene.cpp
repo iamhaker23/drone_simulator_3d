@@ -77,17 +77,6 @@ void Scene::setCameraTrackingEnabled(bool tracking) {
 	Cameras::cameras[activeCamera]->trackTarget = tracking;
 }
 
-void Scene::setCameraTracking(glm::vec3 targetPos, bool tracking) {
-	Cameras::cameras[activeCamera]->targetPos = targetPos;
-	Cameras::cameras[activeCamera]->trackTarget = tracking;
-}
-
-void Scene::setCameraPosition(float x, float y, float z){
-	Cameras::cameras[activeCamera]->localX += x;
-	Cameras::cameras[activeCamera]->localY += y;
-	Cameras::cameras[activeCamera]->localZ += z;
-}
-
 void Scene::addCameraFovDelta(float fovDelta) {
 	Cameras::cameras[activeCamera]->addFovDelta(fovDelta);
 }

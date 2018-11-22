@@ -25,8 +25,6 @@ public:
 	vector<GameObject*> getGameObjects();
 	void nextCamera();
 	
-	void setCameraTracking(glm::vec3 targetPos, bool tracking);
 	void setCameraTrackingEnabled(bool tracking);
-	void setCameraPosition(float x, float y, float z);
 	void addCameraFovDelta(float fovDelta);
 };

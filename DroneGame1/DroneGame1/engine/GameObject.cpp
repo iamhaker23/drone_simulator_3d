@@ -19,6 +19,7 @@ map<int, string> GameObject::shadersLoaded;
 map<int, string> GameObject::modelsLoaded;
 
 GameObject::GameObject() {
+	this->slowParentFactor = 1.0f;
 	shaderIdx = -1;
 	modelIdx = -1;
 	GameObject::shadersLoaded = { };
@@ -27,13 +28,44 @@ GameObject::GameObject() {
 	worldPositionMatrix = glm::translate(glm::mat4(1.0), glm::vec3(worldX, worldY, worldZ));
 
 	parent = NULL;
+	this->physicsSettings = NULL;
+}
+
+void GameObject::addForce(float x, float y, float z) {
+	if (physicsSettings == NULL) {
+		return;
+	}
+
+	physicsSettings->forces += glm::vec3(x, y, z);
+}
+
+void GameObject::doCollisionsAndApplyForces() {
+	if (physicsSettings == NULL) {
+		return;
+	}
+
+	this->localX += physicsSettings->forces[0];
+	this->localY += physicsSettings->forces[1];
+	this->localZ += physicsSettings->forces[2];
+
+	if (physicsSettings->createsLift) {
+		float speedSqrd = (physicsSettings->forces[0] * physicsSettings->forces[0]) + (physicsSettings->forces[2] * physicsSettings->forces[2]);
+		this->worldY += (5.f * physicsSettings->mass) * ((speedSqrd > 0.f)?speedSqrd : 0.f);
+	}
+
+	if (physicsSettings->dynamic) {
+		this->worldY -= 0.05f * physicsSettings->mass;
+	}
+
+	physicsSettings->forces = glm::vec3(0.f, 0.f, 0.f);
 }
 
 GameObject::GameObject(string name, string modelPath, string shaderPath, bool inheritRotation) {
-	
+	this->slowParentFactor = 1.0f;
 	this->inheritRotation = inheritRotation;
-	parent = NULL;
-	
+	this->parent = NULL;
+	this->physicsSettings = physicsSettings;
+
 	this->name = name;
 	shaderIdx = -1;
 	modelIdx = -1;
@@ -79,6 +111,7 @@ GameObject::GameObject(const GameObject & copy) {
 
 	this->inheritRotation = copy.inheritRotation;
 	this->modelViewMatrix = copy.modelViewMatrix;
+	this->worldPositionMatrix = copy.worldPositionMatrix;
 
 	this->shaderIdx = copy.shaderIdx;
 	this->modelIdx = copy.modelIdx;
@@ -86,7 +119,8 @@ GameObject::GameObject(const GameObject & copy) {
 	this->name = copy.name + "_COPY";
 
 	this->parent = copy.parent;
-
+	this->physicsSettings = copy.physicsSettings;
+	this->slowParentFactor = copy.slowParentFactor;
 }
 
 glm::mat4 GameObject::getRotationMatrix(float xRot, float yRot, float zRot) {
@@ -112,8 +146,9 @@ glm::mat4 GameObject::getRotationMatrix(float xRot, float yRot, float zRot) {
 void GameObject::updateTransformation() {
 		
 	if (parent != NULL && inheritRotation) {
+		//TODO: slow parent rotations
+		//worldRotation *= getRotationMatrix(parent->spinXinc*-slowParentFactor, parent->spinYinc*-slowParentFactor, parent->spinZinc*-slowParentFactor);
 		worldRotation = parent->worldRotation;
-		worldRotation *= getRotationMatrix(spinXinc, spinYinc, spinZinc);
 	}
 
 	//apply local transformation
@@ -133,7 +168,7 @@ void GameObject::updateTransformation() {
 	worldPositionMatrix = (parent != NULL) ? parent->worldPositionMatrix : glm::translate(glm::mat4(1), glm::vec3(worldX, worldY, worldZ));
 
 	//apply rotation and translations to modelViewMatrix
-	modelViewMatrix = worldPositionMatrix * worldRotation * localPosition;
+	modelViewMatrix = worldPositionMatrix * (worldRotation) * localPosition;
 
 	//update worldPosition (localtransform is accumulated into worldPosition modelViewMatrix)
 	worldX = modelViewMatrix[3][0];

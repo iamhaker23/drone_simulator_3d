@@ -170,6 +170,9 @@
     <ClInclude Include="game\DroneGameEngine.h">
       <Filter>Header Files\game</Filter>
     </ClInclude>
+    <ClInclude Include="engine\Physics.h">
+      <Filter>Header Files\engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DroneGame1.cpp">

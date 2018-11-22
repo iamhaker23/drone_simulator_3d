@@ -14,22 +14,24 @@ void DroneGameEngine::init() {
 	clearColorRGBA[2] = 0.5f;
 	clearColorRGBA[3] = 0.0f;
 	GameEngine3D::init();
-		
 	
 	Scene* myScene = new Scene();
-	
+		
 	GameObject* drone = new GameObject("Drone1", "Assets/models/drone-1.obj", "Assets/glslfiles/basicTransformations", false);
-	//drone->worldZ = -20.f;
+	drone->physicsSettings = new Physics(2.0f, 1.0f, 0.5f, false, true, true);
+	
 	GameObject* tardis = new GameObject("Tardis", "Assets/models/tardis_1.obj", "Assets/glslfiles/basicTransformations", true);
-	tardis->localY = -20.f;
+	tardis->localY = -5.f;
+	tardis->slowParentFactor = 5.f;
+
 	GameObject* box = new GameObject("Box", "Assets/models/box.obj", "Assets/glslfiles/basicTransformations", true);
 	box->worldZ = -100.f;
 	box->worldX = 5.f;
 
 	GLfloat currentAspect = (GLfloat)(screenWidth / screenHeight);
-	Camera* camera1 = new Camera(20.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
+	Camera* camera1 = new Camera(60.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
 	Camera* camera2 = new Camera(40.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
-	Camera* camera3 = new Camera(60.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
+	Camera* camera3 = new Camera(20.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, NULL);
 
 	myScene->addCamera(camera1, true);
 	myScene->addCamera(camera2, false);
@@ -40,16 +42,15 @@ void DroneGameEngine::init() {
 	camera3->name = "CAMERA3";
 
 	camera1->inheritRotation = true;
-	camera2->inheritRotation = true;
-	camera3->inheritRotation = true;
+	//camera2->inheritRotation = true;
 
-	camera1->localZ = 20.0f;
-	camera2->localZ = 30.0f;
+	camera1->localZ = 30.0f;
+	camera2->localZ = 20.0f;
 	camera3->localZ = 50.0f;
+	camera3->localY = -10.0f;
 
-	camera1->parent = drone;
-	camera2->parent = drone;
-	camera3->parent = drone;
+	camera3->trackTarget = true;
+	camera3->target = drone;
 	
 	myScene->addObject(drone);
 	myScene->addObject(tardis);

@@ -55,27 +55,27 @@ void GameEngine3D::processKeys()
 	float localX = 0, localY = 0, localZ = 0;
 	if (input_manager->isInputActivated(WKEY))
 	{
-		localZ += 0.01f;
+		localZ += -0.01f;
 	}
 	if (input_manager->isInputActivated(SKEY))
 	{
-		localZ += -0.01f;
+		localZ += 0.01f;
 	}
 	if (input_manager->isInputActivated(AKEY))
 	{
-		localX += 0.01f;
+		localX += -0.01f;
 	}
 	if (input_manager->isInputActivated(DKEY))
 	{
-		localX += -0.01f;
+		localX += 0.01f;
 	}
 	if (input_manager->isInputActivated(QKEY))
 	{
-		localY += 0.01f;
+		localY += -0.01f;
 	}
 	if (input_manager->isInputActivated(EKEY))
 	{
-		localY += -0.01f;
+		localY += 0.01f;
 	}
 
 
@@ -107,7 +107,7 @@ void GameEngine3D::processKeys()
 	bool drawDebug = input_manager->isInputActivated(VK_F1);
 
 	float speed = 100.0f;
-	float moveSpeed = 10.0f;
+	float moveSpeed = 11.0f;
 
 	float fovDelta = 0.f;
 	if (input_manager->isInputActivated(VK_ADD)) {
@@ -124,9 +124,7 @@ void GameEngine3D::processKeys()
 		firstObject->spinYinc = spinYinc * speed;
 		firstObject->spinZinc = spinZinc * speed;
 
-		firstObject->localX += localX * moveSpeed;
-		firstObject->localY += localY * moveSpeed;
-		firstObject->localZ += localZ * moveSpeed;
+		firstObject->addForce(localX * moveSpeed, localY * moveSpeed, localZ * moveSpeed);
 		
 		firstObject->drawBounds = drawDebug;
 		firstObject->drawOctree = drawDebug;
@@ -141,11 +139,6 @@ void GameEngine3D::processKeys()
 			current_scene->nextCamera();
 		}
 
-		/*
-		if (input_manager->isInputActivated(VK_TAB)) {
-			current_scene->setCameraTracking(glm::vec3(firstObject->worldX, firstObject->worldY, firstObject->worldZ), true);
-		}
-		*/
 		current_scene->addCameraFovDelta(fovDelta);
 
 	}
@@ -177,13 +170,11 @@ void GameEngine3D::init()
 
 void GameEngine3D::update()
 {
-
-	//collisions
-	//physics
-	//constraints
-
 	current_scene = scene_manager->getActiveScene();
-	
+	vector<GameObject*> current_scene_objects = current_scene->getGameObjects();
+	for (int i = 0; i < (int)current_scene_objects.size(); i++) {
+		current_scene_objects[i]->doCollisionsAndApplyForces();
+	}
 
 }
 
