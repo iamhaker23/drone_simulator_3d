@@ -107,6 +107,16 @@ void GameEngine3D::processKeys()
 	bool drawDebug = input_manager->isInputActivated(VK_F1);
 
 	float speed = 100.0f;
+	float moveSpeed = 10.0f;
+
+	float fovDelta = 0.f;
+	if (input_manager->isInputActivated(VK_ADD)) {
+		fovDelta = -1.0f;
+	}
+	if (input_manager->isInputActivated(VK_SUBTRACT)) {
+		fovDelta = 1.0f;
+	}
+
 
 	if (current_scene != NULL) {
 		GameObject* firstObject = current_scene->getGameObjects()[0];
@@ -114,28 +124,29 @@ void GameEngine3D::processKeys()
 		firstObject->spinYinc = spinYinc * speed;
 		firstObject->spinZinc = spinZinc * speed;
 
-		firstObject->worldX += worldX;
-		firstObject->worldY += worldY;
-		firstObject->worldZ += worldZ;
-
-		firstObject->localX += localX;
-		firstObject->localY += localY;
-		firstObject->localZ += localZ;
-
+		firstObject->localX += localX * moveSpeed;
+		firstObject->localY += localY * moveSpeed;
+		firstObject->localZ += localZ * moveSpeed;
+		
 		firstObject->drawBounds = drawDebug;
 		firstObject->drawOctree = drawDebug;
+		
+		GameObject* secondObject = current_scene->getGameObjects()[1];
+		secondObject->localX += worldX;
+		secondObject->localY += worldY;
+		secondObject->localZ += worldZ;
+		
 
 		if (input_manager->isInputActivated(VK_NUMPAD0)){
 			current_scene->nextCamera();
 		}
-		
+
+		/*
 		if (input_manager->isInputActivated(VK_TAB)) {
-			current_scene->setCameraTargetTrack(true);
+			current_scene->setCameraTracking(glm::vec3(firstObject->worldX, firstObject->worldY, firstObject->worldZ), true);
 		}
-		else {
-			//current_scene->setCameraRotation(spinXinc, spinYinc, spinZinc);
-			//current_scene->setCameraPosition(localX, localY, localZ);
-		}
+		*/
+		current_scene->addCameraFovDelta(fovDelta);
 
 	}
 	

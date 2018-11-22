@@ -11,11 +11,10 @@
 
 #include "GameObject.h"
 
-class Camera {
+class Camera : public GameObject {
 private:
 	float farPlane;
 	float nearPlane;
-	float fov;
 	float aspect;
 	bool updateOnResize;
 	
@@ -25,19 +24,9 @@ public:
 	bool trackTarget = false;
 	glm::vec3 targetPos;
 	glm::vec3 up;
+	float fov;
 
-	GameObject* parent;
-
-	glm::mat4 viewMatrix;
 	glm::mat4 projectionMatrix;
-
-	float camPosX = 0;
-	float camPosY = 0;
-	float camPosZ = 0;
-
-	float camRotX = 0;
-	float camRotY = 0;
-	float camRotZ = 0;
 
 	Camera();
 	Camera(GLfloat fov, GLfloat aspect, GLfloat nearPlane, GLfloat farPlane, bool updateOnResize, GameObject* drone);
@@ -45,5 +34,7 @@ public:
 	Camera(const Camera &copy);
 	
 	void resize(GLfloat width, GLfloat height);
-	void updateTransformation();
+	void updateCameraTransformation();
+	void addFovDelta(float fovDelta);
+	void updateProjectionMatrix();
 };

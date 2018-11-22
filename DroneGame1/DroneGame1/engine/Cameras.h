@@ -18,11 +18,11 @@ class Cameras {
 
 
 public:
-	static vector<Camera> cameras;
+	static vector<Camera*> cameras;
 
 	static void init();
-	static void setCameras(vector<Camera> camList);
-	static void addCamera(Camera cam);
+	static void setCameras(vector<Camera*> camList);
+	static void addCamera(Camera* cam);
 	static void clearCameras();
 };
 

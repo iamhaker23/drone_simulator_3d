@@ -34,8 +34,6 @@ GameObject::GameObject(string name, string modelPath, string shaderPath, bool in
 	this->inheritRotation = inheritRotation;
 	parent = NULL;
 	
-	worldZ = -20;
-
 	this->name = name;
 	shaderIdx = -1;
 	modelIdx = -1;
@@ -71,6 +69,23 @@ GameObject::~GameObject() {
 }
 
 GameObject::GameObject(const GameObject & copy) {
+	this->localX = copy.localX;
+	this->localY = copy.localY;
+	this->localZ = copy.localZ;
+
+	this->spinXinc = copy.spinXinc;
+	this->spinYinc = copy.spinYinc;
+	this->spinZinc = copy.spinZinc;
+
+	this->inheritRotation = copy.inheritRotation;
+	this->modelViewMatrix = copy.modelViewMatrix;
+
+	this->shaderIdx = copy.shaderIdx;
+	this->modelIdx = copy.modelIdx;
+
+	this->name = copy.name + "_COPY";
+
+	this->parent = copy.parent;
 
 }
 
@@ -94,28 +109,31 @@ glm::mat4 GameObject::getRotationMatrix(float xRot, float yRot, float zRot) {
 	return glm::mat4_cast(q) * matrixXY;
 }
 
-void GameObject::updateTransformation(glm::mat4 viewMatrix) {
-
-	//cumulative rotation
-	worldRotation *= getRotationMatrix(spinXinc, spinYinc, spinZinc);
-	
+void GameObject::updateTransformation() {
+		
 	if (parent != NULL && inheritRotation) {
 		worldRotation = parent->worldRotation;
+		worldRotation *= getRotationMatrix(spinXinc, spinYinc, spinZinc);
 	}
 
 	//apply local transformation
 	glm::mat4 localPosition = glm::translate(glm::mat4(1), glm::vec3(localX, localY, localZ));
-	
-	//reset local transform (current change will be accumulated in modelViewMatrix)
-	localX = 0;
-	localY = 0;
-	localZ = 0;
+		
+	if (parent == NULL) {
+		//cumulative rotation
+		worldRotation *= getRotationMatrix(spinXinc, spinYinc, spinZinc);
+
+		//reset local transform (current change will be accumulated in modelViewMatrix)
+		localX = 0;
+		localY = 0;
+		localZ = 0;
+	}
 	
 	//update ViewModel
 	worldPositionMatrix = (parent != NULL) ? parent->worldPositionMatrix : glm::translate(glm::mat4(1), glm::vec3(worldX, worldY, worldZ));
 
 	//apply rotation and translations to modelViewMatrix
-	modelViewMatrix = viewMatrix * worldPositionMatrix * worldRotation * localPosition;
+	modelViewMatrix = worldPositionMatrix * worldRotation * localPosition;
 
 	//update worldPosition (localtransform is accumulated into worldPosition modelViewMatrix)
 	worldX = modelViewMatrix[3][0];
@@ -128,7 +146,8 @@ void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix ) {
 
 	glMatrixMode(GL_MODELVIEW);
 
-	updateTransformation(viewMatrix);
+
+	updateTransformation();
 	
 	Shader* shaderHandle = shaderList[shaderIdx];
 	ThreeDModel* modelHandle = modelList[modelIdx];
@@ -148,8 +167,10 @@ void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix ) {
 	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_specular"), 1, Material_Specular);
 	glUniform1f(glGetUniformLocation(shaderHandle->handle(), "material_shininess"), Material_Shininess);
 	
+	glm::mat4 eyeSpace = (viewMatrix) * modelViewMatrix;
+
 	glUniformMatrix4fv(glGetUniformLocation(shaderHandle->handle(), "ViewMatrix"), 1, GL_FALSE, &viewMatrix[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shaderHandle->handle(), "ModelViewMatrix"), 1, GL_FALSE, &modelViewMatrix[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shaderHandle->handle(), "ModelViewMatrix"), 1, GL_FALSE, &eyeSpace[0][0]);
 	
 	glm::mat3 normalMatrix = glm::inverseTranspose(glm::mat3(modelViewMatrix));
 	glUniformMatrix3fv(glGetUniformLocation(shaderHandle->handle(), "NormalMatrix"), 1, GL_FALSE, &normalMatrix[0][0]);

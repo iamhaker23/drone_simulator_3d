@@ -19,23 +19,54 @@ void DroneGameEngine::init() {
 	Scene* myScene = new Scene();
 	
 	GameObject* drone = new GameObject("Drone1", "Assets/models/drone-1.obj", "Assets/glslfiles/basicTransformations", false);
+	//drone->worldZ = -20.f;
 	GameObject* tardis = new GameObject("Tardis", "Assets/models/tardis_1.obj", "Assets/glslfiles/basicTransformations", true);
+	tardis->localY = -20.f;
+	GameObject* box = new GameObject("Box", "Assets/models/box.obj", "Assets/glslfiles/basicTransformations", true);
+	box->worldZ = -100.f;
+	box->worldX = 5.f;
 
 	GLfloat currentAspect = (GLfloat)(screenWidth / screenHeight);
-	Camera camera1 = Camera(20.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
-	Camera camera2 = Camera(40.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
-	Camera camera3 = Camera(60.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
+	Camera* camera1 = new Camera(20.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
+	Camera* camera2 = new Camera(40.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
+	Camera* camera3 = new Camera(60.0f, currentAspect, (GLfloat)0.1f, (GLfloat)500.0f, true, drone);
 
 	myScene->addCamera(camera1, true);
 	myScene->addCamera(camera2, false);
 	myScene->addCamera(camera3, false);
 
+	camera1->name = "CAMERA1";
+	camera2->name = "CAMERA2";
+	camera3->name = "CAMERA3";
+
+	camera1->inheritRotation = true;
+	camera2->inheritRotation = true;
+	camera3->inheritRotation = true;
+
+	camera1->localZ = 20.0f;
+	camera2->localZ = 30.0f;
+	camera3->localZ = 50.0f;
+
+	camera1->parent = drone;
+	camera2->parent = drone;
+	camera3->parent = drone;
 	
 	myScene->addObject(drone);
 	myScene->addObject(tardis);
+	myScene->addObject(box);
+
+	for (int i = 0; i < 5; i++) {
+		for (int j = 0; j < 5; j++) {
+			GameObject* tmp = new GameObject("Axes", "Assets/models/axes.obj", "Assets/glslfiles/basicTransformations", true);
+			tmp->worldZ = -100.f;
+			tmp->worldX = -20.f +(-10.f * i);
+			tmp->worldY = -30.f + (10.f * j);
+			myScene->addObject(tmp);
+		}
+	}
 	
 	tardis->parent = drone;
-
+	
 	scene_manager->addScene(myScene, true);
 
 	input_manager->cooldown_config[VK_NUMPAD0] = 100;

@@ -60,7 +60,7 @@ public:
 	int doModelLoad(string modelPath);
 	int doShaderLoad(string shaderPath);
 	glm::mat4 getRotationMatrix(float xRot, float yRot, float zRot);
-	void updateTransformation(glm::mat4 viewMatrix);
+	void updateTransformation();
 
 	static void clearResources() {
 

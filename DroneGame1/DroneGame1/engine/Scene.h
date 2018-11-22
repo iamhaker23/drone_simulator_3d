@@ -19,13 +19,14 @@ public:
 	std::string getName();
 	void resizeCameras(GLfloat width, GLfloat height);
 	void draw();
-	int addCamera(Camera cam, bool activate);
+	int addCamera(Camera* cam, bool activate);
 	int addObject(GameObject* toAdd);
 	void setActiveCamera(int idx);
 	vector<GameObject*> getGameObjects();
 	void nextCamera();
 	
-	void setCameraTargetTrack(bool tracking);
+	void setCameraTracking(glm::vec3 targetPos, bool tracking);
+	void setCameraTrackingEnabled(bool tracking);
 	void setCameraPosition(float x, float y, float z);
-	void setCameraRotation(float x, float y, float z);
+	void addCameraFovDelta(float fovDelta);
 };
