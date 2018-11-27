@@ -28,43 +28,47 @@ GameObject::GameObject() {
 	worldPositionMatrix = glm::translate(glm::mat4(1.0), glm::vec3(worldX, worldY, worldZ));
 
 	parent = NULL;
-	this->physicsSettings = NULL;
+	this->physics = NULL;
+	this->material = new Material();
 }
 
 void GameObject::addForce(float x, float y, float z) {
-	if (physicsSettings == NULL) {
+	if (physics == NULL) {
 		return;
 	}
 
-	physicsSettings->forces += glm::vec3(x, y, z);
+	physics->forces += glm::vec3(x, y, z);
 }
 
 void GameObject::doCollisionsAndApplyForces() {
-	if (physicsSettings == NULL) {
+	if (physics == NULL) {
 		return;
 	}
 
-	this->localX += physicsSettings->forces[0];
-	this->localY += physicsSettings->forces[1];
-	this->localZ += physicsSettings->forces[2];
+	this->localX += physics->forces[0];
+	this->localY += physics->forces[1];
+	this->localZ += physics->forces[2];
 
-	if (physicsSettings->createsLift) {
-		float speedSqrd = (physicsSettings->forces[0] * physicsSettings->forces[0]) + (physicsSettings->forces[2] * physicsSettings->forces[2]);
-		this->worldY += (5.f * physicsSettings->mass) * ((speedSqrd > 0.f)?speedSqrd : 0.f);
+	if (physics->createsLift) {
+		float speedSqrd = (physics->forces[0] * physics->forces[0]) + (physics->forces[2] * physics->forces[2]) + (physics->forces[1] * physics->forces[1]);
+		this->worldY += (5.f * physics->mass) * ((speedSqrd > 0.f)?speedSqrd : 0.f);
 	}
 
-	if (physicsSettings->dynamic) {
-		this->worldY -= 0.05f * physicsSettings->mass;
+	if (physics->dynamic) {
+		float gravity = 0.1f * physics->mass;
+		this->worldY -= gravity;
+		physics->forces[1] -= gravity;
 	}
-
-	physicsSettings->forces = glm::vec3(0.f, 0.f, 0.f);
+	physics->oldForces = glm::vec3(physics->forces);
+	physics->forces = glm::vec3(0.f, 0.f, 0.f);
 }
 
 GameObject::GameObject(string name, string modelPath, string shaderPath, bool inheritRotation) {
 	this->slowParentFactor = 1.0f;
 	this->inheritRotation = inheritRotation;
 	this->parent = NULL;
-	this->physicsSettings = physicsSettings;
+	this->physics = NULL;
+	this->material = new Material();
 
 	this->name = name;
 	shaderIdx = -1;
@@ -119,7 +123,7 @@ GameObject::GameObject(const GameObject & copy) {
 	this->name = copy.name + "_COPY";
 
 	this->parent = copy.parent;
-	this->physicsSettings = copy.physicsSettings;
+	this->physics = copy.physics;
 	this->slowParentFactor = copy.slowParentFactor;
 }
 
@@ -189,18 +193,22 @@ void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix ) {
 
 	glUseProgram(shaderHandle->handle());  // use the shader
 
+
 	GLuint matLocation = glGetUniformLocation(shaderHandle->handle(), "ProjectionMatrix");
 	glUniformMatrix4fv(matLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
-	
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPos"), 1, LightPos);
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambient"), 1, Light_Ambient_And_Diffuse);
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffuse"), 1, Light_Ambient_And_Diffuse);
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specular"), 1, Light_Specular);
 
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_ambient"), 1, Material_Ambient);
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_diffuse"), 1, Material_Diffuse);
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_specular"), 1, Material_Specular);
-	glUniform1f(glGetUniformLocation(shaderHandle->handle(), "material_shininess"), Material_Shininess);
+	GLuint scaleLocation = glGetUniformLocation(shaderHandle->handle(), "scale");
+	glUniform1f(scaleLocation, scale);
+	
+	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPos"), 1, activeLights[0]->worldPosition);
+	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambient"), 1, activeLights[0]->color);
+	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffuse"), 1, activeLights[0]->color);
+	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specular"), 1, activeLights[0]->specular);
+
+	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_ambient"), 1, material->ambient);
+	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_diffuse"), 1, material->diffuse);
+	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_specular"), 1, material->specular);
+	glUniform1f(glGetUniformLocation(shaderHandle->handle(), "material_shininess"), material->shininess);
 	
 	glm::mat4 eyeSpace = (viewMatrix) * modelViewMatrix;
 

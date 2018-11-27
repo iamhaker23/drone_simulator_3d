@@ -3,18 +3,21 @@
 #include <iostream>
 #include "GameObject.h"
 #include "Cameras.h"
+#include "Light.h"
 
 class Scene {
 private:
 	int activeCamera = -1;
-	std::string scene_name;
-	vector<GameObject*> objects;
-
+	
 public:
 
 	Scene();
 	Scene(const Scene &copy);
 	~Scene();
+
+	vector<Light*> lights;
+	std::string scene_name;
+	vector<GameObject*> objects;
 
 	std::string getName();
 	void resizeCameras(GLfloat width, GLfloat height);
@@ -26,5 +29,7 @@ public:
 	void nextCamera();
 	
 	void setCameraTrackingEnabled(bool tracking);
-	void addCameraFovDelta(float fovDelta);
+	Camera* Scene::getCurrentCamera();
+
+	void assignLights(GameObject* object);
 };

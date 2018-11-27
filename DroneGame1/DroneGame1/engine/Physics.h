@@ -17,6 +17,7 @@ public:
 	bool ghost;
 	bool dynamic;
 	glm::vec3 forces;
+	glm::vec3 oldForces;
 	bool createsLift;
 
 	inline Physics() {

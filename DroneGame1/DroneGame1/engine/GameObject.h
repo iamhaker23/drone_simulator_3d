@@ -12,6 +12,8 @@
 #include "../lib/3DStruct/threeDModel.h"
 #include "../lib/Obj/OBJLoader.h"
 #include "Physics.h"
+#include "Light.h"
+#include "Material.h"
 
 #include <map>
 
@@ -31,26 +33,21 @@ private:
 	int shaderIdx;
 	int modelIdx;
 
-	float Material_Ambient[4] = { 0.1f, 0.1f, 0.1f, 1.0f };
-	float Material_Diffuse[4] = { 0.8f, 0.8f, 0.5f, 1.0f };
-	float Material_Specular[4] = { 0.9f,0.9f,0.8f,1.0f };
-	float Material_Shininess = 5;
-	float Light_Ambient_And_Diffuse[4] = { 0.8f, 0.8f, 0.6f, 1.0f };
-	float Light_Specular[4] = { 1.0f,1.0f,1.0f,1.0f };
-	float LightPos[4] = { 0.0f, 5.0f, 10.0f, 0.0f };
-
 public:
 	float slowParentFactor;
 	glm::mat4 worldPositionMatrix;
 	glm::mat4 modelViewMatrix;
 	GameObject* parent;
 	bool inheritRotation = false;
-	Physics* physicsSettings;
+	Physics* physics;
+	Material* material;
+	Light* activeLights[4] = { 0 };
 
 	float spinXinc = 0, spinYinc = 0, spinZinc = 0;
 	float worldX = 0, worldY = 0, worldZ = 0;
 	float localX = 0, localY = 0, localZ = 0;
 	bool drawBounds = false, drawOctree = false;
+	float scale = 1.0f;
 
 	string name;
 
@@ -78,4 +75,6 @@ public:
 	void draw(glm::mat4 projectionMatrix, glm::mat4 viewMatrix);
 	void addForce(float x, float y, float z);
 	void doCollisionsAndApplyForces();
+
+
 };

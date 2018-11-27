@@ -98,6 +98,8 @@
     <ClInclude Include="engine\GameEngine.h" />
     <ClInclude Include="engine\GameObject.h" />
     <ClInclude Include="engine\InputManager.h" />
+    <ClInclude Include="engine\Light.h" />
+    <ClInclude Include="engine\Material.h" />
     <ClInclude Include="engine\Physics.h" />
     <ClInclude Include="engine\SceneManager.h" />
     <ClInclude Include="engine\glm\ext.hpp" />

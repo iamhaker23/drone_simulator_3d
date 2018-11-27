@@ -75,7 +75,7 @@ void GameEngine3D::processKeys()
 	}
 	if (input_manager->isInputActivated(EKEY))
 	{
-		localY += 0.01f;
+		localY += 0.02f;
 	}
 
 
@@ -123,24 +123,55 @@ void GameEngine3D::processKeys()
 		firstObject->spinXinc = spinXinc * speed;
 		firstObject->spinYinc = spinYinc * speed;
 		firstObject->spinZinc = spinZinc * speed;
+		
+		if (input_manager->isInputActivated(VK_F2)) {
+			firstObject->physics->dynamic = !firstObject->physics->dynamic;
+		}
 
+		Camera* current_camera = current_scene->getCurrentCamera();
+		
 		firstObject->addForce(localX * moveSpeed, localY * moveSpeed, localZ * moveSpeed);
+
+		float x = firstObject->physics->oldForces[0];
+		float y = firstObject->physics->oldForces[1];
+		float z = firstObject->physics->oldForces[2];
+		float speedSquared = (x*x) + (y*y) + (z*z);
+		float fovSpeedFactor = current_camera->speedToFov*speedSquared;
+				
+		float fovSpeedDelta = ((fovSpeedFactor < 0.01f) ? -0.1f : 0.1f);
+
+		if (current_camera->fov >= current_camera->originalFov+30.0f) {
+			if (fovSpeedDelta > 0.0f) fovSpeedDelta = 0.0f;
+			if (fovDelta > 0.0f) fovDelta = 0.0f;
+		}
+		else if (current_camera->fov <= current_camera->originalFov) {
+			if (fovSpeedDelta < 0.0f) fovSpeedDelta = 0.0f;
+			if (fovDelta < 0.0f) fovDelta = 0.0f;
+		}
+
+		//if (fovSpeedDelta != 0.f) fovDelta = 0.f;
+		if (fovDelta != 0.f || current_camera->fov <= current_camera->originalFov || current_camera->fov >= current_camera->originalFov + 30.0f) fovSpeedDelta = 0.f;
+
+		current_camera->fov += fovSpeedDelta + fovDelta;
+		current_camera->updateProjectionMatrix();
 		
 		firstObject->drawBounds = drawDebug;
 		firstObject->drawOctree = drawDebug;
-		
+
 		GameObject* secondObject = current_scene->getGameObjects()[1];
 		secondObject->localX += worldX;
 		secondObject->localY += worldY;
 		secondObject->localZ += worldZ;
+
+
+		GameObject* thirdObject = current_scene->getGameObjects()[2];
+		thirdObject->spinYinc = 0.1f;
 		
 
 		if (input_manager->isInputActivated(VK_NUMPAD0)){
 			current_scene->nextCamera();
 		}
-
-		current_scene->addCameraFovDelta(fovDelta);
-
+		
 	}
 	
 

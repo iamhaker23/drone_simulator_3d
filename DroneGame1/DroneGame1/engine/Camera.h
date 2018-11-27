@@ -25,6 +25,8 @@ public:
 	GameObject* target;
 	glm::vec3 up;
 	float fov;
+	float originalFov;
+	float speedToFov = 1.f;
 
 	glm::mat4 projectionMatrix;
 
@@ -35,6 +37,5 @@ public:
 	
 	void resize(GLfloat width, GLfloat height);
 	void updateCameraTransformation();
-	void addFovDelta(float fovDelta);
 	void updateProjectionMatrix();
 };

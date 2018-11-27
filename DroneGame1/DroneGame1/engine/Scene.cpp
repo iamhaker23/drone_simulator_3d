@@ -30,6 +30,9 @@ Scene::~Scene()
 	while (objects.size() > 0) {
 		objects.erase(objects.begin());
 	}
+	while (lights.size() > 0) {
+		lights.erase(lights.begin());
+	}
 
 }
 
@@ -53,6 +56,7 @@ void Scene::draw() {
 	
 
 	for (int i = 0; i < (int)objects.size(); i++) {
+		assignLights(objects[i]);
 		objects[i]->draw(Cameras::cameras[activeCamera]->projectionMatrix, cameraModelView);
 	}
 
@@ -77,7 +81,11 @@ void Scene::setCameraTrackingEnabled(bool tracking) {
 	Cameras::cameras[activeCamera]->trackTarget = tracking;
 }
 
-void Scene::addCameraFovDelta(float fovDelta) {
-	Cameras::cameras[activeCamera]->addFovDelta(fovDelta);
+Camera* Scene::getCurrentCamera() {
+	return Cameras::cameras[activeCamera];
+}
+
+void Scene::assignLights(GameObject* object) {
+	object->activeLights[0] = lights[0];
 }
 

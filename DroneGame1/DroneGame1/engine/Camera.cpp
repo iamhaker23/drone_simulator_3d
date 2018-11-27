@@ -4,7 +4,8 @@ Camera::Camera() : GameObject(){
 	
 	this->farPlane = 200.0f;
 	this->nearPlane = 1.f;
-	this->fov = 50.f;
+	this->fov = 50.f; 
+	this->originalFov = 50.f;
 	this->aspect = 1.f;
 
 	//update the aspect?
@@ -20,6 +21,7 @@ Camera::Camera(GLfloat fov, GLfloat aspect, GLfloat nearPlane, GLfloat farPlane,
 	
 	this->farPlane = farPlane;
 	this->nearPlane = nearPlane;
+	this->originalFov = fov;
 	this->fov = fov;
 	this->aspect = aspect;
 	this->updateOnResize = updateOnResize;
@@ -42,6 +44,7 @@ Camera::Camera(const Camera &copy) : GameObject(copy) {
 	this->farPlane = copy.farPlane;
 	this->nearPlane = copy.nearPlane;
 	this->fov = copy.fov;
+	this->originalFov = copy.originalFov;
 	this->aspect = copy.aspect;
 
 	//update the aspect?
@@ -73,12 +76,6 @@ void Camera::updateCameraTransformation() {
 		
 }
 
-void Camera::addFovDelta(float fovDelta) {
-	this->fov += fovDelta;
-	if (this->fov < 1.f) this->fov = 1.f;
-	if (this->fov >= 170.f) this->fov = 170.f;
-	this->updateProjectionMatrix();
-}
 void Camera::updateProjectionMatrix() {
 	this->projectionMatrix = glm::perspective(fov, aspect, nearPlane, farPlane);
 }
