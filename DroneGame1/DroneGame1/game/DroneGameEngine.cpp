@@ -21,7 +21,7 @@ void DroneGameEngine::init() {
 	drone->physics = new Physics(2.0f, 1.0f, 0.5f, false, true, false);
 	
 	GameObject* tardis = new GameObject("Tardis", "Assets/models/tardis_1.obj", "Assets/glslfiles/basicTransformations", true);
-	tardis->localY = -5.f;
+	tardis->localY = 10.f;
 	tardis->slowParentFactor = 5.f;
 
 	GameObject* misc1 = new GameObject("Dragon", "Assets/models/dragon.obj", "Assets/glslfiles/basicTransformations", true);
@@ -53,7 +53,8 @@ void DroneGameEngine::init() {
 	camera1->inheritRotation = true;
 	//camera2->inheritRotation = true;
 
-	camera1->localZ = 30.0f;
+	camera1->localZ = 10.0f;
+	camera1->localY = 2.0f;
 	camera2->localZ = 40.0f;
 	camera3->worldZ = -120.f;
 	camera3->worldX = 20.f;
@@ -92,7 +93,7 @@ void DroneGameEngine::init() {
 
 	myScene->addObject(terrain_1);
 	
-	tardis->parent = drone;
+	tardis->parent = misc1;
 	
 	//myScene->lights.push_back(new Light(glm::vec3(0.f, 0.f, 0.f), glm::vec4(1.f, 1.f, 1.f, 1.f)));
 	myScene->lights.push_back(new Light());

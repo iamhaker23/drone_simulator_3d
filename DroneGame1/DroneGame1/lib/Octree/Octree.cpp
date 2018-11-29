@@ -485,7 +485,7 @@ void Octree::drawBoundingBox(Shader* myShader)
 	}
 	else
 	{
-		box->render();
+		box->render(myShader);
 	}
 }
 

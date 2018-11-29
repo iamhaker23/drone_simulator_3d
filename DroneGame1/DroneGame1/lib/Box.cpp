@@ -9,12 +9,14 @@ Box::Box()
 	dim = 1.0;
 }
 
-void Box::render()
+void Box::render(Shader* myShader)
 {
 	//draw objects
+	//vertex data
 	glBindVertexArray(m_vaoID);		// select VAO
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//ibo - indexes of which vertices are in which faces 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glDrawElements(GL_TRIANGLES, numOfTris*3, GL_UNSIGNED_INT, 0);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -76,7 +78,6 @@ void Box::constructGeometry(Shader* myShader, float minx, float miny, float minz
 	glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, 0, 0); 
 	glEnableVertexAttribArray(vertexLocation);
 
-	
 	glBindBuffer(GL_ARRAY_BUFFER, m_vboID[1]);
 	glBufferData(GL_ARRAY_BUFFER, numOfVerts*3*sizeof(GLfloat), cols, GL_STATIC_DRAW);
 	GLint colorLocation= glGetAttribLocation(myShader->handle(), "in_Color");

@@ -155,9 +155,11 @@ void GameEngine3D::processKeys()
 		current_camera->fov += fovSpeedDelta + fovDelta;
 		current_camera->updateProjectionMatrix();
 		
-		firstObject->drawBounds = drawDebug;
-		firstObject->drawOctree = drawDebug;
-
+		for (int go = 0; go < (int)current_scene->objects.size(); go++) {
+			current_scene->objects[go]->drawBounds = drawDebug;
+			current_scene->objects[go]->drawOctree = drawDebug;
+		}
+		
 		GameObject* secondObject = current_scene->getGameObjects()[1];
 		secondObject->localX += worldX;
 		secondObject->localY += worldY;
@@ -204,8 +206,9 @@ void GameEngine3D::update()
 	current_scene = scene_manager->getActiveScene();
 	vector<GameObject*> current_scene_objects = current_scene->getGameObjects();
 	for (int i = 0; i < (int)current_scene_objects.size(); i++) {
-		current_scene_objects[i]->doCollisionsAndApplyForces();
+		current_scene_objects[i]->doCollisionsAndApplyForces(current_scene_objects);
 	}
+
 
 }
 

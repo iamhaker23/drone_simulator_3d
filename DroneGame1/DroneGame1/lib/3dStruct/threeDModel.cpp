@@ -92,7 +92,7 @@ void ThreeDModel::operator=(const ThreeDModel &p)
 	numberOfMatrials = p.numberOfMatrials;
 	numberOfVertNormals = p.numberOfVertNormals;
 
-	theBBox = p.theBBox;
+	boundingBox = p.boundingBox;
 
 	if(p.theVerts != NULL)
 	{
@@ -247,13 +247,13 @@ void ThreeDModel::calcCentrePoint()
 			}
 		}
 
-		theBBox.boxWidthX = float(maxX-minX);
-		theBBox.boxWidthY = float(maxY-minY);
-		theBBox.boxWidthZ = float(maxZ-minZ);
+		boundingBox.boxWidthX = float(maxX-minX);
+		boundingBox.boxWidthY = float(maxY-minY);
+		boundingBox.boxWidthZ = float(maxZ-minZ);
 
-		theBBox.centrePoint = Vector3d(minX+(theBBox.boxWidthX/2.0f),
-			minY+(theBBox.boxWidthY/2.0f),
-			minZ+(theBBox.boxWidthZ/2.0f));
+		boundingBox.centrePoint = Vector3d(minX+(boundingBox.boxWidthX/2.0f),
+			minY+(boundingBox.boxWidthY/2.0f),
+			minZ+(boundingBox.boxWidthZ/2.0f));
 		return;
 	}
 
@@ -280,13 +280,13 @@ void ThreeDModel::calcCentrePoint()
 		}
 	}
 	
-	theBBox.boxWidthX = float(maxX-minX);
-	theBBox.boxWidthY = float(maxY-minY);
-	theBBox.boxWidthZ = float(maxZ-minZ);
+	boundingBox.boxWidthX = float(maxX-minX);
+	boundingBox.boxWidthY = float(maxY-minY);
+	boundingBox.boxWidthZ = float(maxZ-minZ);
 
-	theBBox.centrePoint = Vector3d(minX+(theBBox.boxWidthX/2.0f),
-								   minY+(theBBox.boxWidthY/2.0f),
-								   minZ+(theBBox.boxWidthZ/2.0f));
+	boundingBox.centrePoint = Vector3d(minX+(boundingBox.boxWidthX/2.0f),
+								   minY+(boundingBox.boxWidthY/2.0f),
+								   minZ+(boundingBox.boxWidthZ/2.0f));
 	
 	
 }
@@ -484,19 +484,19 @@ void ThreeDModel::centreOnZero()
 	{
 		for (int count = 0; count < numberOfTriangles*3*3; count+=3)
 		{
-			vertexPositionList[count] = vertexPositionList[count] - theBBox.centrePoint.x;
-			vertexPositionList[count+1] = vertexPositionList[count+1] - theBBox.centrePoint.y;
-			vertexPositionList[count+2] = vertexPositionList[count+2] - theBBox.centrePoint.z;
+			vertexPositionList[count] = vertexPositionList[count] - boundingBox.centrePoint.x;
+			vertexPositionList[count+1] = vertexPositionList[count+1] - boundingBox.centrePoint.y;
+			vertexPositionList[count+2] = vertexPositionList[count+2] - boundingBox.centrePoint.z;
 		}
 	}
 	else
 	{
 		for (int count = 0; count < numberOfVertices; count++)
 		{
-			theVerts[count] = theVerts[count] - theBBox.centrePoint;
+			theVerts[count] = theVerts[count] - boundingBox.centrePoint;
 		}
 	}
-	theBBox.centrePoint = Vector3d(0,0,0);
+	boundingBox.centrePoint = Vector3d(0,0,0);
 }
 
 void ThreeDModel::scale(float scaleAmount)
@@ -549,7 +549,7 @@ void ThreeDModel::adjustBoundingBox()
 		{
 			if ((vertexPositionList[count] > -1000) && (vertexPositionList[count+1] > -1000) && (vertexPositionList[count+2] > -1000))
 			{
-				Vector2d tempVec(vertexPositionList[count]-theBBox.centrePoint.x, vertexPositionList[count+2]-theBBox.centrePoint.z);
+				Vector2d tempVec(vertexPositionList[count]-boundingBox.centrePoint.x, vertexPositionList[count+2]-boundingBox.centrePoint.z);
 				float tempSize = sqrt(tempVec.x * tempVec.x + tempVec.y * tempVec.y);
 				if (tempSize > maxdisplace)
 				{
@@ -564,7 +564,7 @@ void ThreeDModel::adjustBoundingBox()
 		{
 			if ((theVerts[count].x > -1000) && (theVerts[count].y > -1000) && (theVerts[count].z > -1000))
 			{
-				Vector2d tempVec(theVerts[count].x-theBBox.centrePoint.x, theVerts[count].z-theBBox.centrePoint.z);
+				Vector2d tempVec(theVerts[count].x-boundingBox.centrePoint.x, theVerts[count].z-boundingBox.centrePoint.z);
 				float tempSize = sqrt(tempVec.x * tempVec.x + tempVec.y * tempVec.y);
 				if (tempSize > maxdisplace)
 				{
@@ -574,8 +574,8 @@ void ThreeDModel::adjustBoundingBox()
 		}
 	}
 
-	theBBox.boxWidthX = maxdisplace * 2.0f;
-	theBBox.boxWidthZ = maxdisplace * 2.0f;
+	boundingBox.boxWidthX = maxdisplace * 2.0f;
+	boundingBox.boxWidthZ = maxdisplace * 2.0f;
 }
 
 
@@ -792,7 +792,6 @@ void ThreeDModel::initDrawElements()
 void ThreeDModel::drawElementsUsingVBO(Shader* myShader)
 {
 
-
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
@@ -818,8 +817,6 @@ void ThreeDModel::drawElementsUsingVBO(Shader* myShader)
 	}
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);	
-	
-	
 	glBindVertexArray(0);	
 }
 

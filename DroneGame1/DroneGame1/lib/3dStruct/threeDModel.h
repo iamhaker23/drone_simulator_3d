@@ -84,7 +84,7 @@ public:
 	int numberOfTexCoords; 
 	int numberOfMatrials;
 
-	BoundingBox theBBox;	
+	BoundingBox boundingBox;	
 	
 	Vector3d * theVerts;
 	Vector3d * theFaceNormals;

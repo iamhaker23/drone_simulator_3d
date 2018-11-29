@@ -26,7 +26,7 @@ private:
 public:
 	Box();
 	void constructGeometry(Shader* myShader, float minx, float miny, float minz, float maxx, float maxy, float maxz);
-	void render();
+	void render(Shader* myShader);
 };
 
 #endif _BOX_H

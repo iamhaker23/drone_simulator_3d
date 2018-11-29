@@ -11,6 +11,7 @@
 
 class Physics {
 public:
+
 	float mass;
 	float frictionCoefficient;
 	float collisionMargin;
@@ -31,6 +32,7 @@ public:
 	}
 
 	inline Physics(float mass, float fric, float collMargin, bool ghost, bool dynamic, bool createsLift) {
+		
 		this->forces = glm::vec3(0.f, 0.f, 0.f);
 		this->mass = mass;
 		this->frictionCoefficient = fric;
