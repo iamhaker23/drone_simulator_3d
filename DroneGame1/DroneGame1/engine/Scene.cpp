@@ -3,6 +3,7 @@
 Scene::Scene()
 {
 	objects = vector<GameObject*>();
+	lights = vector<Light*>();
 	Cameras::init();
 }
 
@@ -53,14 +54,15 @@ void Scene::draw() {
 	}
 	glm::mat4 cameraModelView = glm::inverse(Cameras::cameras[activeCamera]->modelViewMatrix);
 
-
 	for (int i = 0; i < (int)objects.size(); i++) {
 		assignLights(objects[i]);
+		
 		objects[i]->draw(Cameras::cameras[activeCamera]->projectionMatrix, cameraModelView);
+		
 	}
 
-
 	Cameras::cameras[activeCamera]->updateCameraTransformation();
+
 }
 
 int Scene::addObject(GameObject* toAdd) {
@@ -86,6 +88,13 @@ Camera* Scene::getCurrentCamera() {
 }
 
 void Scene::assignLights(GameObject* object) {
-	object->activeLights[0] = lights[0];
+	//TODO: get nearest lights? lights of most influence?
+	object->numLights = 0;
+	for (int i = 0; i < 4; i++) {
+		if (i < (int)lights.size()) {
+			object->numLights++;
+			object->activeLights[i] = lights[i];
+		}
+	}
 }
 

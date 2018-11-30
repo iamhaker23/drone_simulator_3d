@@ -12,10 +12,14 @@
 class Material {
 public:
 	
-	float ambient[4] = { 0.1f, 0.1f, 0.1f, 1.f};
-	float diffuse[4] = { 0.7f, 0.7f, 0.7f, 1.f };
-	float specular[4] = { .7f, .7f, .7f, 1.f };
-	float shininess = 50.0f;
+	float ambient[4] = { .2f, .2f, .2f, 1.f};
+	float diffuse[4] = { .8f, .8f, .8f, 1.f };
+	float specular[4] = { 1.f, 1.f, 1.f, 1.f };
+	float shininess = 10.f;
+	int shadeless = 0;
+	int normalMapping = 0;
+	float alphaClipThreshold = 0.f;
+	float uvOffset[2] = { 0 };
 
 	inline Material() {
 	}

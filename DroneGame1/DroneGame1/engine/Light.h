@@ -13,7 +13,7 @@ class Light {
 public:
 	float color[4] = {.5f, .5f, .5f, .5f};
 	float specular[4] = {.5f, .5f, .5f, .5f};
-	float worldPosition[4] = {0.f, 0.f, 1.f, 0.f};
+	float worldPosition[4] = {0.f, 0.f, 0.f, 1.f};
 	
 	inline Light() {
 

@@ -16,11 +16,7 @@
 #include "Cameras.h"
 
 class GameEngine3D : public GameEngine {
-private:
-
-	//TODO: Refactor
-	float amount = 0;
-	float temp = 0.5f;
+protected:
 	Scene* current_scene;
 
 public:
@@ -28,8 +24,10 @@ public:
 	GameEngine3D(const GameEngine3D &copy);
 	~GameEngine3D();
 
+	void cameraUpdateFovManual(Camera* current_camera, float fovDelta);
+	void cameraUpdateFovAuto(Camera* current_camera, float xSpeed, float ySpeed, float zSpeed);
+	void cameraUpdateFov(Camera* current_camera, float xSpeed, float ySpeed, float zSpeed, bool automaticMode, float fovDelta);
 
-	void processKeys();
 	void draw();
 	void init();
 	void update();

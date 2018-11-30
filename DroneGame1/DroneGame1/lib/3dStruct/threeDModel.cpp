@@ -797,17 +797,21 @@ void ThreeDModel::drawElementsUsingVBO(Shader* myShader)
 
 	glBindVertexArray(m_vaoID);	
 		
-	//TODO: multitexture here
-	//e.g. normal mapping
 	glUniform1i(glGetUniformLocation(myShader->handle(), "DiffuseMap"), 0);
+	glUniform1i(glGetUniformLocation(myShader->handle(), "NormalMap"), 1);
 
 	for(unsigned int i=0;i<length.size();i+=3)
 	{
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, length[i+2]);// count]/3	
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, length[i + 2]);// count]/3	
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, length[i + 2]);// count]/3	
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
 		//std::cout << " length " << length[i] << " " << length[i+1] << " " << length[i+2] << std::endl;
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer[4+(i/3)]);
 		
@@ -820,7 +824,7 @@ void ThreeDModel::drawElementsUsingVBO(Shader* myShader)
 	glBindVertexArray(0);	
 }
 
-static int   sortByMat( const void *tpi, const void *tpj )
+static int sortByMat( const void *tpi, const void *tpj )
 {
 	aFace* pi, *pj;
 	pi = (aFace*)tpi;

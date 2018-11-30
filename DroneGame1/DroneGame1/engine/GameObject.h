@@ -35,20 +35,24 @@ private:
 	int shaderIdx;
 	int modelIdx;
 
+	static float GameObject::yAxisFloor;
+
 public:
 	float slowParentFactor;
 	glm::mat4 worldPositionMatrix;
 	glm::mat4 modelViewMatrix;
 	glm::mat4 viewMatrix;
 	glm::mat4 projectionMatrix;
-
+	
 	GameObject* parent;
 	bool inheritRotation = false;
 	Physics* physics;
 	Material* material;
 	Light* activeLights[4] = { 0 };
+	int numLights = 0;
 
-	float radius = 10.0f;
+
+	float radius = 1.0f;
 
 	unsigned int tmpVaoId = 0;
 	unsigned int tmpVboId[1];

@@ -18,6 +18,7 @@ vector<ThreeDModel*> GameObject::modelList;
 map<int, string> GameObject::shadersLoaded = {};
 map<int, string> GameObject::modelsLoaded = {};
 int GameObject::debugShader = -1;
+float GameObject::yAxisFloor = -30.0f;
 
 GameObject::GameObject() {
 	this->slowParentFactor = 1.0f;
@@ -54,15 +55,22 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 
 	if (!physics->ghost) {
 		vector<glm::vec3> forcesFromCollisions = getForcesFromCollisions(colliders);
-		physics->forces += resolveForces(forcesFromCollisions);
+		glm::vec3 overrideForce = resolveForces(forcesFromCollisions);
+		if (overrideForce.x != 0 && overrideForce.y != 0 && overrideForce.z != 0) {
+			//if cross product <= max && >= -max then ADD
+			/*
+			glm::vec3 cross = glm::cross(overrideForce, physics->forces);
+			if (cross.x != 0 && cross.y != 0 && cross.z != 0) cross = glm::normalize(cross);
+			float lengthSqrd = (cross.x*cross.x) + (cross.y*cross.y) + (cross.z*cross.z);
+			physics->forces = (lengthSqrd <= 0.6f) ? overrideForce : physics->forces + overrideForce;
+			*/
+			physics->forces = overrideForce;
+
+		}
 	}
 
-	this->localX += physics->forces[0];
-	this->localY += physics->forces[1];
-	this->localZ += physics->forces[2];
-
 	if (physics->createsLift) {
-		float speedSqrd = (physics->forces[0] * physics->forces[0]) + (physics->forces[2] * physics->forces[2]) + (physics->forces[1] * physics->forces[1]);
+		float speedSqrd = (physics->forces[0] * physics->forces[0]) + (physics->forces[1] * physics->forces[1]) + (physics->forces[2] * physics->forces[2]);
 		float lift = (5.f * physics->mass) * ((speedSqrd > 0.f) ? speedSqrd : 0.f);
 		this->worldY += lift;
 		//TODO: the lift should be the world-space vector projected onto local y-axis
@@ -72,9 +80,11 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 	if (physics->dynamic) {
 		float gravity = 0.1f * physics->mass;
 		this->worldY -= gravity;
-		//TODO: the gravity should be the world-space vector projected onto local y-axis
-		physics->forces[1] -= gravity;
 	}
+	
+	this->localX += physics->forces[0];
+	this->localY += physics->forces[1];
+	this->localZ += physics->forces[2];
 
 	physics->oldForces = glm::vec3(physics->forces);
 	physics->forces = glm::vec3(0.f, 0.f, 0.f);
@@ -90,7 +100,7 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 
 	for (int i = 0; i < (int)colliders.size(); i++) {
 		GameObject* other = colliders[i];
-		if (other->name != name) {
+		if (other->name != name && other->physics != NULL) {
 			ThreeDModel* otherModel = GameObject::modelList[other->modelIdx];
 			//glm::vec4 otherWorld = glm::vec4(other->worldX, other->worldY, other->worldZ, 1.f);// *modelViewMatrix;
 			glm::vec3 otherWorld = glm::vec3(other->worldX, other->worldY, other->worldZ);// *modelViewMatrix;
@@ -106,11 +116,11 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 				((myWorld.y - otherWorld.y)*(myWorld.y - otherWorld.y)) +
 				((myWorld.z - otherWorld.z)*(myWorld.z - otherWorld.z));
 
-			if (diff < (radius+other->radius)*(radius + other->radius) ){//(r+r)^2 
+			if (diff < ((radius)+other->radius)*(radius + other->radius) ){//(r+r)^2 
 				glm::vec3 collisionForce = glm::vec3((myWorld.x - otherWorld.x), (myWorld.y - otherWorld.y), (myWorld.z - otherWorld.z));
 				
 				//TODO: normalize cannot take distance zero
-				//forceList.push_back(0.1f * glm::normalize(collisionForce));
+				if (collisionForce.x != 0.f && collisionForce.y != 0.f && collisionForce.z != 0.f) forceList.push_back(glm::normalize(collisionForce)*( (radius)/diff) );
 			}
 
 			//projection of edge is dot(edge, axis)
@@ -303,34 +313,43 @@ void GameObject::updateTransformation() {
 		//worldRotation *= getRotationMatrix(parent->spinXinc*-slowParentFactor, parent->spinYinc*-slowParentFactor, parent->spinZinc*-slowParentFactor);
 		worldRotation = parent->worldRotation;
 	}
-
-	//apply local transformation
-	glm::mat4 localPosition = glm::translate(glm::mat4(1), glm::vec3(localX, localY, localZ));
-		
-	if (parent == NULL) {
+	else {
 		//cumulative rotation
 		worldRotation *= getRotationMatrix(spinXinc, spinYinc, spinZinc);
 
-		//reset local transform (current change will be accumulated in modelViewMatrix)
+	}
+
+
+	//apply local transformation
+	glm::mat4 localPosition = glm::translate(glm::mat4(1), glm::vec3(localX, localY, localZ));
+	//reset local space co-ordinates if this is root
+	//BECAUSE local co-ordinates are converted to a world space translation and applied to world space co-ordinates
+	//So if this object is the root then it will be at origin of it's local space
+	//OTHERWISE it's local space co-ordinates must be preserved to be applied in parent-space
+	if (parent == NULL) {
+		
 		localX = 0;
 		localY = 0;
 		localZ = 0;
 	}
-	
+	else {
+		if (parent->physics != NULL) localPosition = localPosition * glm::translate(glm::mat4(1), glm::vec3(parent->physics->oldForces.x, parent->physics->oldForces.y, parent->physics->oldForces.z));
+	}
+
 	//update ViewModel
 	//if (parent != NULL) parent->updateTransformation();
 	worldPositionMatrix = (parent != NULL) ? parent->worldPositionMatrix : glm::translate(glm::mat4(1), glm::vec3(worldX, worldY, worldZ));
 
 	//apply rotation and translations to modelViewMatrix
-	modelViewMatrix = worldPositionMatrix * (worldRotation) * localPosition;
+	modelViewMatrix = worldPositionMatrix * (worldRotation) * (localPosition);
 
 	//update worldPosition (localtransform is accumulated into worldPosition modelViewMatrix)
 	worldX = modelViewMatrix[3][0];
 	worldY = modelViewMatrix[3][1];
 	worldZ = modelViewMatrix[3][2];
 
-	if (worldY <= -30.f) worldY = -30.f;
-	
+	if (worldY <= GameObject::yAxisFloor) worldY = GameObject::yAxisFloor;
+
 }
 
 void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix) {
@@ -350,11 +369,41 @@ void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix) {
 
 	GLuint scaleLocation = glGetUniformLocation(shaderHandle->handle(), "scale");
 	glUniform1f(scaleLocation, scale);
-	
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPos"), 1, activeLights[0]->worldPosition);
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambient"), 1, activeLights[0]->color);
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffuse"), 1, activeLights[0]->color);
-	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specular"), 1, activeLights[0]->specular);
+
+	if (numLights > 0) {
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosA"), 1, activeLights[0]->worldPosition);
+
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambienta"), 1, activeLights[0]->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffusea"), 1, activeLights[0]->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_speculara"), 1, activeLights[0]->specular);
+	}
+	if (numLights > 1) {
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosB"), 1, activeLights[1]->worldPosition);
+
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientb"), 1, activeLights[1]->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffuseb"), 1, activeLights[1]->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specularb"), 1, activeLights[1]->specular);
+	}
+	if (numLights > 2) {
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosC"), 1, activeLights[2]->worldPosition);
+
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientc"), 1, activeLights[2]->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffusec"), 1, activeLights[2]->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specularc"), 1, activeLights[2]->specular);
+	}
+	if (numLights > 3) {
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosD"), 1, activeLights[3]->worldPosition);
+
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientd"), 1, activeLights[3]->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffused"), 1, activeLights[3]->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_speculard"), 1, activeLights[3]->specular);
+	}
+	glUniform1i(glGetUniformLocation(shaderHandle->handle(), "numLights"), numLights);
+	glUniform1f(glGetUniformLocation(shaderHandle->handle(), "alphaClip"), material->alphaClipThreshold);
+	glUniform2fv(glGetUniformLocation(shaderHandle->handle(), "uvOffset"), 1, material->uvOffset);
+
+	glUniform1i(glGetUniformLocation(shaderHandle->handle(), "shadeless"), material->shadeless);
+	glUniform1i(glGetUniformLocation(shaderHandle->handle(), "normalMapping"), material->normalMapping);
 
 	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_ambient"), 1, material->ambient);
 	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_diffuse"), 1, material->diffuse);

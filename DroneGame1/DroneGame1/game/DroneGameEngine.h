@@ -8,4 +8,5 @@ class DroneGameEngine : public GameEngine3D {
 public:
 	DroneGameEngine();
 	void init();
+	void processKeys();
 };
