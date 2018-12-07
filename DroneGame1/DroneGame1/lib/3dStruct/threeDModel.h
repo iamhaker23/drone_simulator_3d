@@ -27,6 +27,8 @@ public:
 	float specular[4]; //Specular color
 	float shininess;   //Matl shininess
 	int textureID;			//Texturemap
+	int bumpTextureID;			//Texturemap
+	bool bump = false;
 	bool hasTexture;
 
 	aMaterial() //defualt const
@@ -40,6 +42,7 @@ public:
 
 		shininess = 0;
 		textureID = 0;
+		bumpTextureID = 0;
 		hasTexture = false;
 	}
 
@@ -93,7 +96,8 @@ public:
 
 	unsigned int* indexArray;
 	std::vector<unsigned int> startPoints;
-	std::vector<unsigned int> length;	
+	std::vector<unsigned int> materialAttributes;	
+	int MATERIAL_ATTRIBS = 4;
 
 	GLfloat *vertexPositionList;
 	GLfloat *vertexNormalList;

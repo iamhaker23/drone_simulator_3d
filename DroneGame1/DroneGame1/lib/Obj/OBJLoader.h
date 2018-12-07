@@ -26,10 +26,13 @@ struct ObjMat
 	float d;
 	float ns;
 	int illum;
-	char textureName[255];
+	char textureName[255] = { 0 };
+	char bumpTextureName[255] = { 0 };
+	bool bump = false;
 
 	//Created
-	int glIndex;
+	int glIndex = 0;
+	int glIndexBump = 0;
 };
 
 //-------------------------------------------------------------

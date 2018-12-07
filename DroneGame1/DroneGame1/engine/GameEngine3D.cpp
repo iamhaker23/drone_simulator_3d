@@ -73,6 +73,7 @@ void GameEngine3D::update()
 		current_scene_objects[i]->doCollisionsAndApplyForces(current_scene_objects);
 	}
 
+
 }
 
 void GameEngine3D::resize(int width, int height)

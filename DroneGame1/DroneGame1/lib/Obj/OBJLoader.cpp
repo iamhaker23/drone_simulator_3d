@@ -110,6 +110,8 @@ bool OBJLoader::loadModel(const char * fileName, ThreeDModel& theResult)
 		temp.specular[2] = current.specCol[2];
 
 		temp.textureID = current.glIndex;
+		temp.bump = current.bump;
+		if (temp.bump) temp.bumpTextureID = current.glIndexBump;
 
 		strcpy_s(temp.matName,sizeof(char)*255, current.matName);
 		strcpy_s(temp.fileName, sizeof(char)*255, current.textureName);
@@ -238,6 +240,11 @@ bool OBJLoader::myMTLLoader(const char *mainName, const char *filename)
 				string s = actualPath + "\\" + newMaterial.textureName;
 				newMaterial.glIndex = TextureHandler::lookUpTexture(s, true);
 
+				if (newMaterial.bump) {
+					string s2 = actualPath + "\\" + newMaterial.bumpTextureName;
+					newMaterial.glIndexBump = TextureHandler::lookUpTexture(s2, true);
+				}
+
 				theMats.push_back(newMaterial);
 
 			}
@@ -343,13 +350,17 @@ bool OBJLoader::myMTLLoader(const char *mainName, const char *filename)
 
 		}
 
-		else if(identifierStr == "map_Ka")//skip not used
+		else if(identifierStr == "map_Bump")//modified for normal map
 
 		{
 
 			fin.getline(line, 255); //textureName
 
 			fin >> ws; 
+			
+			newMaterial.bump = true;
+			
+			sscanf_s(line, "%s", &newMaterial.bumpTextureName, _countof(line));
 
 		}
 
@@ -373,9 +384,15 @@ bool OBJLoader::myMTLLoader(const char *mainName, const char *filename)
 
 		//sprintf(buf, "%s/%s",actualPath.c_str(),newMaterial.textureName); 
 		string s = actualPath + "\\" + newMaterial.textureName;
-		newMaterial.glIndex = TextureHandler::lookUpTexture(s, true);
 		
-		cout << "MATERIAL " << newMaterial.textureName << " " << newMaterial.glIndex << endl;
+		newMaterial.glIndex = TextureHandler::lookUpTexture(s, true);
+
+		if (newMaterial.bump) {
+			string s2 = actualPath + "\\" + newMaterial.bumpTextureName;
+			newMaterial.glIndexBump = TextureHandler::lookUpTexture(s2, true);
+		}
+
+		cout << "MATERIAL " << newMaterial.textureName << " " << newMaterial.glIndex << "+" << newMaterial.glIndexBump << endl;
 
 		theMats.push_back(newMaterial);
 

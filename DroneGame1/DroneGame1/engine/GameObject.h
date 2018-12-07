@@ -12,8 +12,8 @@
 #include "../lib/3DStruct/threeDModel.h"
 #include "../lib/Obj/OBJLoader.h"
 #include "Physics.h"
-#include "Light.h"
 #include "Material.h"
+#include "Light.h"
 #include "../lib/Octree/Octree.h"
 
 #include <map>
@@ -48,7 +48,10 @@ public:
 	bool inheritRotation = false;
 	Physics* physics;
 	Material* material;
-	Light* activeLights[4] = { 0 };
+	
+	GameObject* activeLights[4] = { 0 };
+	Light* myLight;
+
 	int numLights = 0;
 
 
@@ -71,6 +74,9 @@ public:
 
 	GameObject();
 	GameObject(string name, string modelPath, string shaderPath, bool inheritRotation);
+	static GameObject* makeLight(glm::vec3 localPosition, glm::vec4 color, float power);
+	float* getLightPosition();
+
 	~GameObject();
 	GameObject(const GameObject &copy);
 
@@ -95,6 +101,6 @@ public:
 	void draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix);
 	void addForce(float x, float y, float z);
 	void doCollisionsAndApplyForces(vector<GameObject*> colliders);
-
+	vector<glm::vec3> getHitPositions(GameObject* a, GameObject* b);
 
 };

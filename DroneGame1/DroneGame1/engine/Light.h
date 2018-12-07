@@ -13,44 +13,41 @@ class Light {
 public:
 	float color[4] = {.5f, .5f, .5f, .5f};
 	float specular[4] = {.5f, .5f, .5f, .5f};
-	float worldPosition[4] = {0.f, 0.f, 0.f, 1.f};
+	float power = 1.f;
+	bool selfLight = false;
 	
 	inline Light() {
 
 	}
 
-	inline Light(glm::vec3 worldPosition, glm::vec4 color) {
-		this->color[0] = color[0];
-		this->color[1] = color[1];
-		this->color[2] = color[2];
-		this->color[3] = color[3];
+	inline Light(glm::vec4 color, float power) {
+		this->power = power;
 
 		this->color[0] = color[0];
 		this->color[1] = color[1];
 		this->color[2] = color[2];
 		this->color[3] = color[3];
 
-		this->worldPosition[0] = worldPosition[0];
-		this->worldPosition[1] = worldPosition[1];
-		this->worldPosition[2] = worldPosition[2];
-		this->worldPosition[3] = 0.f;
+		this->specular[0] = color[0];
+		this->specular[1] = color[1];
+		this->specular[2] = color[2];
+		this->specular[3] = color[3];
+
 	}
 
 	inline Light(const Light &copy) {
-		this->color[0] = copy.color[0];
-		this->color[1] = copy.color[1];
-		this->color[2] = copy.color[2];
-		this->color[3] = copy.color[3];
+		this->power = copy.power;
 
 		this->color[0] = copy.color[0];
 		this->color[1] = copy.color[1];
 		this->color[2] = copy.color[2];
 		this->color[3] = copy.color[3];
 
-		this->worldPosition[0] = copy.worldPosition[0];
-		this->worldPosition[1] = copy.worldPosition[1];
-		this->worldPosition[2] = copy.worldPosition[2];
-		this->worldPosition[3] = copy.worldPosition[3];
+		this->specular[0] = copy.specular[0];
+		this->specular[1] = copy.specular[1];
+		this->specular[2] = copy.specular[2];
+		this->specular[3] = copy.specular[3];
+
 	}
 
 	

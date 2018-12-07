@@ -72,7 +72,7 @@ ThreeDModel::~ThreeDModel()
 	vertexColorList = NULL;
 
 	startPoints.clear();
-	length.clear();	
+	materialAttributes.clear();	
 }
 
 
@@ -122,10 +122,10 @@ void ThreeDModel::operator=(const ThreeDModel &p)
 	}
 
 	indexArray = NULL;
-	length.clear();
-	for(unsigned int i=0;i<p.length.size();i++)
+	materialAttributes.clear();
+	for(unsigned int i=0;i<p.materialAttributes.size();i++)
 	{
-		length.push_back(p.length[i]);
+		materialAttributes.push_back(p.materialAttributes[i]);
 	}
 
 	if(p.vertexPositionList != NULL)
@@ -586,7 +586,7 @@ void ThreeDModel::initVBO(Shader* myShader)
 	// First VAO setup
 	glBindVertexArray(m_vaoID);
 
-	int numOfMaterials = length.size()/3;
+	int numOfMaterials = materialAttributes.size()/MATERIAL_ATTRIBS;
 	std::cout << " initVBO " << numOfMaterials << std::endl;
 
 	int sizeOfGLBuffer = 4+numOfMaterials;
@@ -626,10 +626,10 @@ void ThreeDModel::initVBO(Shader* myShader)
 
 	
 	std::cout << " make faceIDsList " << std::endl;
-	for(unsigned int i=0;i<length.size();i+=3)
+	for(unsigned int i=0;i<materialAttributes.size();i+=MATERIAL_ATTRIBS)
 	{
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer[4+(i/3)]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, (length[i+1]-length[i]+3)*sizeof(GLuint), faceIDsList+(length[i]), GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, (materialAttributes[i+1]-materialAttributes[i]+ MATERIAL_ATTRIBS)*sizeof(GLuint), faceIDsList+(materialAttributes[i]), GL_STATIC_DRAW);
 	}
 
 	glEnableVertexAttribArray(0);
@@ -654,19 +654,22 @@ void ThreeDModel::initDrawElements()
 	}
 	
 
-	length.clear();
+	materialAttributes.clear();
 	unsigned int polyCount = 0;
 	unsigned int polyCounter = 0;
 	std::cout << " numberOftriangles " << numberOfTriangles << std::endl;
 	int matID = theMaterials[theFaces[0].materialId].textureID;
+	int matID2 = theMaterials[theFaces[0].materialId].bumpTextureID;
 	for(int x = 0; x < numberOfTriangles; x++)
 	{
 		if (matID != theMaterials[theFaces[x].materialId].textureID)
 		{
-			length.push_back(polyCount*3);
-			length.push_back((polyCount+polyCounter-1)*3);		
-			length.push_back(matID);
-			matID = theMaterials[theFaces[x].materialId].textureID;			
+			materialAttributes.push_back(polyCount*3);
+			materialAttributes.push_back((polyCount+polyCounter-1)*3);		
+			materialAttributes.push_back(matID);
+			materialAttributes.push_back(matID2);
+			matID = theMaterials[theFaces[x].materialId].textureID;
+			matID2 = theMaterials[theFaces[x].materialId].bumpTextureID;
 			//polyCount = 0;
 			polyCount = polyCount+polyCounter;
 			polyCounter = 1;			
@@ -678,11 +681,12 @@ void ThreeDModel::initDrawElements()
 		}
 		//polyCount++;
 	}
-	length.push_back(polyCount*3);//*3
-	length.push_back((polyCount+polyCounter-1)*3);//*3
+	materialAttributes.push_back(polyCount*3);//*3
+	materialAttributes.push_back((polyCount+polyCounter-1)*3);//*3
 	//length.push_back(numberOfTriangles*3);
-	length.push_back(matID);
-	std::cout << " number of different textures: " << length.size()/3 << std::endl;	
+	materialAttributes.push_back(matID);
+	materialAttributes.push_back(matID2);
+	std::cout << " number of different texture pairs: " << materialAttributes.size()/MATERIAL_ATTRIBS << std::endl;	
 	//length.push_back(0);
 	//length.push_back(numberOfTriangles*3);
 
@@ -800,24 +804,27 @@ void ThreeDModel::drawElementsUsingVBO(Shader* myShader)
 	glUniform1i(glGetUniformLocation(myShader->handle(), "DiffuseMap"), 0);
 	glUniform1i(glGetUniformLocation(myShader->handle(), "NormalMap"), 1);
 
-	for(unsigned int i=0;i<length.size();i+=3)
+	for(unsigned int i=0;i<materialAttributes.size();i+= MATERIAL_ATTRIBS)
 	{
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, length[i + 2]);// count]/3	
+		glBindTexture(GL_TEXTURE_2D, materialAttributes[i + 2]);// count]/3	
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, length[i + 2]);// count]/3	
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		
+		if (materialAttributes[i + 3] != 0) {
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, materialAttributes[i + 3]);// count]/3	
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
 
 		//std::cout << " length " << length[i] << " " << length[i+1] << " " << length[i+2] << std::endl;
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, glBuffer[4+(i/3)]);
 		
 		//draw wireframe
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, (length[i+1]-length[i]+3), GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, (materialAttributes[i+1]-materialAttributes[i]+3), GL_UNSIGNED_INT, 0);
 	}
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);	

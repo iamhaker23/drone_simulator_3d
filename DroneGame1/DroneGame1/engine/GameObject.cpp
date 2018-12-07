@@ -20,6 +20,25 @@ map<int, string> GameObject::modelsLoaded = {};
 int GameObject::debugShader = -1;
 float GameObject::yAxisFloor = -30.0f;
 
+
+float* GameObject::getLightPosition() {
+	return new float[4]{ worldX, worldY, worldZ, 1.f };
+}
+
+GameObject* GameObject::makeLight(glm::vec3 localPosition, glm::vec4 color, float power) {
+	GameObject* light = new GameObject();
+	
+	//light->inheritRotation = true;
+	
+	light->localX = localPosition[0];
+	light->localY = localPosition[1];
+	light->localZ = localPosition[2];
+
+	light->myLight = new Light(color, power);
+	return light;
+}
+
+
 GameObject::GameObject() {
 	this->slowParentFactor = 1.0f;
 	shaderIdx = -1;
@@ -91,6 +110,17 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 }
 
 
+vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
+	
+	vector<glm::vec3> hits = vector<glm::vec3>();
+	Octree* aOct = GameObject::modelList[a->modelIdx]->octree;
+	Octree* bOct = GameObject::modelList[b->modelIdx]->octree;
+
+
+
+	return hits;
+}
+
 vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> colliders) {
 	vector<glm::vec3> forceList = {};
 
@@ -117,10 +147,13 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 				((myWorld.z - otherWorld.z)*(myWorld.z - otherWorld.z));
 
 			if (diff < ((radius)+other->radius)*(radius + other->radius) ){//(r+r)^2 
-				glm::vec3 collisionForce = glm::vec3((myWorld.x - otherWorld.x), (myWorld.y - otherWorld.y), (myWorld.z - otherWorld.z));
 				
-				//TODO: normalize cannot take distance zero
-				if (collisionForce.x != 0.f && collisionForce.y != 0.f && collisionForce.z != 0.f) forceList.push_back(glm::normalize(collisionForce)*( (radius)/diff) );
+				vector<glm::vec3> hitPositions = GameObject::getHitPositions(this, other);
+				
+				for (int i = 0; i < (int)hitPositions.size(); i++){
+					glm::vec3 collisionForce = glm::vec3((hitPositions[i].x - otherWorld.x), (hitPositions[i].y - otherWorld.y), (hitPositions[i].z - otherWorld.z));
+					if (collisionForce.x != 0.f && collisionForce.y != 0.f && collisionForce.z != 0.f) forceList.push_back(glm::normalize(collisionForce)*((radius) / diff));
+				}
 			}
 
 			//projection of edge is dot(edge, axis)
@@ -352,11 +385,13 @@ void GameObject::updateTransformation() {
 
 }
 
+
 void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix) {
 
 	glMatrixMode(GL_MODELVIEW);
 	
-	updateTransformation();
+	//lights which are drawn will be updated in the light loop
+	if (myLight == NULL) updateTransformation();
 	
 	Shader* shaderHandle = shaderList[shaderIdx];
 	ThreeDModel* modelHandle = modelList[modelIdx];
@@ -371,32 +406,37 @@ void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix) {
 	glUniform1f(scaleLocation, scale);
 
 	if (numLights > 0) {
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosA"), 1, activeLights[0]->worldPosition);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosA"), 1, activeLights[0]->getLightPosition());
 
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambienta"), 1, activeLights[0]->color);
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffusea"), 1, activeLights[0]->color);
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_speculara"), 1, activeLights[0]->specular);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambienta"), 1, activeLights[0]->myLight->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffusea"), 1, activeLights[0]->myLight->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_speculara"), 1, activeLights[0]->myLight->specular);
+		glUniform1f(glGetUniformLocation(shaderHandle->handle(), "light_powera"), activeLights[0]->myLight->power);
+
 	}
 	if (numLights > 1) {
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosB"), 1, activeLights[1]->worldPosition);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosB"), 1, activeLights[1]->getLightPosition());
 
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientb"), 1, activeLights[1]->color);
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffuseb"), 1, activeLights[1]->color);
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specularb"), 1, activeLights[1]->specular);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientb"), 1, activeLights[1]->myLight->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffuseb"), 1, activeLights[1]->myLight->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specularb"), 1, activeLights[1]->myLight->specular);
+		glUniform1f(glGetUniformLocation(shaderHandle->handle(), "light_powerb"), activeLights[1]->myLight->power);
 	}
 	if (numLights > 2) {
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosC"), 1, activeLights[2]->worldPosition);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosC"), 1, activeLights[2]->getLightPosition());
 
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientc"), 1, activeLights[2]->color);
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffusec"), 1, activeLights[2]->color);
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specularc"), 1, activeLights[2]->specular);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientc"), 1, activeLights[2]->myLight->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffusec"), 1, activeLights[2]->myLight->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_specularc"), 1, activeLights[2]->myLight->specular);
+		glUniform1f(glGetUniformLocation(shaderHandle->handle(), "light_powerc"), activeLights[2]->myLight->power);
 	}
 	if (numLights > 3) {
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosD"), 1, activeLights[3]->worldPosition);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "LightPosD"), 1, activeLights[3]->getLightPosition());
 
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientd"), 1, activeLights[3]->color);
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffused"), 1, activeLights[3]->color);
-		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_speculard"), 1, activeLights[3]->specular);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_ambientd"), 1, activeLights[3]->myLight->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_diffused"), 1, activeLights[3]->myLight->color);
+		glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "light_speculard"), 1, activeLights[3]->myLight->specular);
+		glUniform1f(glGetUniformLocation(shaderHandle->handle(), "light_powerd"), activeLights[3]->myLight->power);
 	}
 	glUniform1i(glGetUniformLocation(shaderHandle->handle(), "numLights"), numLights);
 	glUniform1f(glGetUniformLocation(shaderHandle->handle(), "alphaClip"), material->alphaClipThreshold);

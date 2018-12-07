@@ -20,9 +20,13 @@ void DroneGameEngine::init() {
 	GameObject* drone = new GameObject("Drone1", "Assets/models/drone-1.obj", "Assets/glslfiles/basicTransformations", false);
 	drone->physics = new Physics(2.0f, 1.0f, 0.5f, false, true, false);
 	drone->radius = 1.0f;
+	drone->material->normalMapping = 1;
 	
 	GameObject* tardis = new GameObject("Tardis", "Assets/models/tardis_1.obj", "Assets/glslfiles/basicTransformations", true);
 	tardis->localY = -10.f;
+	tardis->material->normalMapping = 1;
+	tardis->radius = 5.0f;
+	tardis->physics = new Physics(1.0f, 1.0f, 0.1f, false, true, false);
 
 	GameObject* misc1 = new GameObject("Dragon", "Assets/models/dragon/dragon.obj", "Assets/glslfiles/basicTransformations", true);
 	misc1->worldZ = 100.f;
@@ -30,7 +34,7 @@ void DroneGameEngine::init() {
 	misc1->scale = 5.0f;
 	misc1->radius = 25.f;
 
-	misc1->material->shininess = 0.01f;
+	misc1->material->shininess = 0.5f;
 	misc1->material->normalMapping = 1;
 
 	GameObject* sky_clouds = new GameObject("Clouds", "Assets/models/sky/clouds.obj", "Assets/glslfiles/basicTransformations", true);
@@ -91,11 +95,18 @@ void DroneGameEngine::init() {
 	camera3->trackTarget = true;
 	camera3->target = drone;
 
-	myScene->lights.push_back(new Light());
-	myScene->lights.push_back(new Light(glm::vec3(20.f, 20.f, 0.f), glm::vec4(0.9f, 0.3f, 0.2f, 1.f)));
-	myScene->lights.push_back(new Light(glm::vec3(0.f, -30.f, 0.f), glm::vec4(0.f, 0.6f, 0.f, 1.f)));
-	myScene->lights.push_back(new Light(glm::vec3(0.f, 50.f, 0.f), glm::vec4(0.f, 0.f, 0.7f, 1.f)));
+	//GameObject* droneLamp = GameObject::makeLight(glm::vec3(0.f, 2.f, -1.f), glm::vec4(0.4f, 0.4f, 0.9f, 1.f), 10.0f);
+	//droneLamp->parent = drone;
+	//myScene->lights.push_back(drone);
+	drone->myLight = new Light(glm::vec4(0.4f, 0.9f, 0.5f, 1.f), 10.0f);
+	myScene->lights.push_back(drone);
 
+	GameObject* sun = GameObject::makeLight(glm::vec3(0.f, 20.f, 0.f), glm::vec4(0.8f, 0.7f, 0.1f, 1.f), 5.0f);
+	sun->myLight->specular[0] = 0.1f;
+	sun->myLight->specular[1] = 0.1f;
+	sun->myLight->specular[2] = 0.1f;
+	myScene->lights.push_back(sun);
+	
 	scene_manager->addScene(myScene, true);
 
 	input_manager->cooldown_config[VK_F2] = 40;
@@ -209,11 +220,6 @@ void DroneGameEngine::processKeys()
 	if (current_scene != NULL) {
 		GameObject* firstObject = current_scene->getGameObjects()[0];
 		
-		current_scene->lights[0]->worldPosition[0] = firstObject->worldX;
-		current_scene->lights[0]->worldPosition[1] = firstObject->worldY;
-		current_scene->lights[0]->worldPosition[2] = firstObject->worldZ;
-
-
 		firstObject->spinXinc = spinXinc * speed;
 		firstObject->spinYinc = spinYinc * speed;
 		firstObject->spinZinc = spinZinc * speed;

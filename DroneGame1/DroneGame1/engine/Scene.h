@@ -15,7 +15,7 @@ public:
 	Scene(const Scene &copy);
 	~Scene();
 
-	vector<Light*> lights;
+	vector<GameObject*> lights;
 	std::string scene_name;
 	vector<GameObject*> objects;
 

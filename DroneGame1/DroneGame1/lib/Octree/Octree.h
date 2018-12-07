@@ -24,9 +24,10 @@ private:
 	int* VertexList;
 	int VertexListSize;
 
-	Box* box;
 
 public:
+	Box* box;
+
 	Octree();
 	~Octree();
 	int* getPrimitiveList();
