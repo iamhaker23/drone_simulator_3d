@@ -9,16 +9,17 @@ DroneGameEngine::DroneGameEngine() : GameEngine3D() {
 void DroneGameEngine::init() {
 
 	//override GameEngine3D clear color
-	clearColorRGBA[0] = 0.5f;
-	clearColorRGBA[1] = 0.5f;
-	clearColorRGBA[2] = 0.5f;
-	clearColorRGBA[3] = 0.0f;
+	clearColorRGBA[0] = 0.1f;
+	clearColorRGBA[1] = 0.1f;
+	clearColorRGBA[2] = 0.1f;
+	clearColorRGBA[3] = 1.0f;
 	GameEngine3D::init();
 	
 	Scene* myScene = new Scene();
 
 	GameObject* drone = new GameObject("Drone1", "Assets/models/drone-1.obj", "Assets/glslfiles/basicTransformations", false);
 	drone->physics = new Physics(2.0f, 1.0f, 0.5f, false, true, false);
+	drone->physics->gravity = false;
 	drone->radius = 1.0f;
 	drone->material->normalMapping = 1;
 	
@@ -32,18 +33,32 @@ void DroneGameEngine::init() {
 	GameObject* misc1 = new GameObject("Dragon", "Assets/models/dragon/dragon.obj", "Assets/glslfiles/basicTransformations", true);
 	misc1->worldZ = 100.f;
 	misc1->worldX = 5.f;
-	misc1->scale = 5.0f;
+	misc1->worldY = -17.0f;
+	misc1->scale = 2.0f;
 	misc1->radius = 25.f;
 	misc1->physics = new Physics();
-
 	misc1->material->shininess = 0.5f;
 	misc1->material->normalMapping = 1;
+
+
+	GameObject* misc2 = new GameObject("Rock1", "Assets/models/rock/rock.obj", "Assets/glslfiles/basicTransformations", true);
+	misc2->worldZ = 70.f;
+	misc2->worldX = 10.f;
+	misc2->worldY = -29.0f;
+	misc2->physics = new Physics();
+
+
+	GameObject* misc3 = new GameObject("Water", "Assets/models/water/water.obj", "Assets/glslfiles/basicTransformations", true);
+	misc3->worldY = -60.0f;
+	misc3->scale = 10.0f;
 
 	GameObject* sky_clouds = new GameObject("SkyClouds", "Assets/models/sky/clouds.obj", "Assets/glslfiles/basicTransformations", true);
 	GameObject* sky_stars = new GameObject("SkyStars", "Assets/models/sky/stars.obj", "Assets/glslfiles/basicTransformations", true);
 	GameObject* sky_col = new GameObject("SkyHorizon", "Assets/models/sky/sky.obj", "Assets/glslfiles/basicTransformations", true);
 	sky_clouds->material->shadeless = 1;
+	sky_clouds->material->diffuse[4] = 0.1f;
 	sky_stars->material->shadeless = 1;
+	sky_col->material->diffuse[4] = 0.1f;
 	sky_col->material->shadeless = 1;
 	//sky_clouds->material->alphaClipThreshold = 0.5f;
 
@@ -60,13 +75,18 @@ void DroneGameEngine::init() {
 	myScene->addObject(drone);
 	myScene->addObject(tardis); 
 	myScene->addObject(misc1);
-	
-	myScene->addObject(sky_clouds);
+	myScene->addObject(misc2);
+
 	myScene->addObject(sky_stars);
 	myScene->addObject(sky_col);
+	myScene->addObject(sky_clouds);
+
+	myScene->addObject(misc3);
+
+	
 	
 	GameObject* terrain_1 = new GameObject("Terrain", "Assets/models/terrain_1.obj", "Assets/glslfiles/basicTransformations", true);
-	terrain_1->worldY = -5.f;
+	terrain_1->worldY = -50.f;
 	terrain_1->scale = 10.0f;
 	terrain_1->physics = new Physics();
 	//terrain_1->material->shadeless = 1;
@@ -101,10 +121,10 @@ void DroneGameEngine::init() {
 	//GameObject* droneLamp = GameObject::makeLight(glm::vec3(0.f, 2.f, -1.f), glm::vec4(0.4f, 0.4f, 0.9f, 1.f), 10.0f);
 	//droneLamp->parent = drone;
 	//myScene->lights.push_back(drone);
-	drone->myLight = new Light(glm::vec4(0.4f, 0.9f, 0.5f, 1.f), 10.0f);
+	drone->myLight = new Light(glm::vec4(0.4f, 0.9f, 0.5f, 1.f), 5.0f);
 	myScene->lights.push_back(drone);
 
-	GameObject* sun = GameObject::makeLight(glm::vec3(0.f, 20.f, 0.f), glm::vec4(0.8f, 0.7f, 0.1f, 1.f), 5.0f);
+	GameObject* sun = GameObject::makeLight(glm::vec3(0.f, 20.f, 0.f), glm::vec4(0.8f, 0.7f, 0.1f, 1.f), 15.0f);
 	sun->myLight->specular[0] = 0.1f;
 	sun->myLight->specular[1] = 0.1f;
 	sun->myLight->specular[2] = 0.1f;
@@ -259,14 +279,19 @@ void DroneGameEngine::processKeys()
 		secondObject->localZ += worldZ;
 
 
-		GameObject* thirdObject = current_scene->getGameObjects()[3];
-		thirdObject->spinYinc = 0.01f;
-		thirdObject->material->uvOffset[0] = (thirdObject->material->uvOffset[0] + 0.0001f);
-		thirdObject->material->uvOffset[1] = (thirdObject->material->uvOffset[1] + 0.0001f);
+		GameObject* clouds = current_scene->getGameObjects()[6];
+		clouds->spinYinc = 0.01f;
+		clouds->material->uvOffset[1] = (clouds->material->uvOffset[0] + 0.0006f);
+		//clouds->material->uvOffset[1] = (clouds->material->uvOffset[1] + 0.0001f);
 
-		thirdObject = current_scene->getGameObjects()[5];
-		thirdObject->spinYinc = -0.1f;
+		clouds = current_scene->getGameObjects()[4];
+		clouds->spinYinc = -0.002f;
 
+
+		GameObject* water = current_scene->getGameObjects()[7];
+		water->spinYinc = 0.07f;
+		water->material->uvOffset[0] = (clouds->material->uvOffset[0] + 0.1f);
+		water->material->uvOffset[1] = (clouds->material->uvOffset[1] + 0.1f);
 
 		if (input_manager->isInputActivated(VK_NUMPAD0)) {
 			current_scene->nextCamera();

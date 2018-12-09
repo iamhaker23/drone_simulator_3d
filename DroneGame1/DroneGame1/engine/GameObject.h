@@ -47,7 +47,6 @@ public:
 	glm::mat4 projectionMatrix;
 
 	glm::mat4 oldMV;
-	glm::vec3 oldNear;
 	
 	GameObject* parent;
 	bool inheritRotation = false;

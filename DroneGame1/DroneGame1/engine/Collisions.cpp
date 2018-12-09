@@ -1,6 +1,13 @@
 #include "Collisions.h"
 
 
+bool Collisions::doSAT(ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::mat4 MVb, bool chooser) {
+
+	vector<Octree*> colliders = doSAT(a->octree, b->octree, MVa, MVb);
+
+	return ((int)colliders.size() == 2);
+}
+
 glm::vec3 Collisions::doSAT(ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::mat4 MVb) {
 
 	glm::vec3 hitPoint = glm::vec3(0);
@@ -18,8 +25,8 @@ glm::vec3 Collisions::doSAT(ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::
 		glm::vec3 aLargestExtent = glm::vec3(aOct->box->verts[21], aOct->box->verts[22], aOct->box->verts[23]) - glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2]);
 		glm::vec3 bLargestExtent = glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]);
 
-		glm::mat4 aLargestExtentWorld = glm::translate(glm::mat4(1.f), aLargestExtent) * MVa;
-		glm::mat4 bLargestExtentWorld = glm::translate(glm::mat4(1.f), bLargestExtent) * MVb;
+		glm::mat4 aLargestExtentWorld = glm::translate(glm::mat4(1.f), aLargestExtent);
+		glm::mat4 bLargestExtentWorld = glm::translate(glm::mat4(1.f), bLargestExtent);
 
 		glm::mat4 hitPointM = bLargestExtentWorld + (aLargestExtentWorld - bLargestExtentWorld/2.f);
 		hitPoint = glm::vec3(hitPointM[3][0], hitPointM[3][1], hitPointM[3][2]);
@@ -140,45 +147,34 @@ vector<glm::vec3> Collisions::getAxes(Box* a, Box* b, glm::mat4 MVa, glm::mat4 M
 
 	vector<glm::vec3> axes = vector<glm::vec3>();
 
-	//minAll to maxx, miny, minz
-	glm::vec3 v1 = glm::vec3(a->verts[0], a->verts[1], a->verts[2]);
-	glm::vec3 v2 = glm::vec3(a->verts[9], a->verts[10], a->verts[11]);
-	glm::mat4 a0m = MVa * glm::translate(glm::mat4(1.f), (v1 - v2));
+	glm::vec3 v1 = glm::vec3(a->verts[0], 0, 0);
+	glm::vec3 v2 = glm::vec3(a->verts[21], 0, 0);
+	glm::vec3 a0 = (v1 - v2);
 
-	//minAll to minx, maxy, minz
-	v1 = glm::vec3(a->verts[0], a->verts[1], a->verts[2]);
-	v2 = glm::vec3(a->verts[3], a->verts[4], a->verts[5]);
-	glm::mat4 a1m = MVa * glm::translate(glm::mat4(1.f), (v1 - v2));
+	v1 = glm::vec3(0, a->verts[1], 0);
+	v2 = glm::vec3(0, a->verts[22], 0);
+	glm::vec3 a1 = (v1 - v2);
 
-	//minAll to minx, miny, maxz
-	v1 = glm::vec3(a->verts[0], a->verts[1], a->verts[2]);
-	v2 = glm::vec3(a->verts[12], a->verts[13], a->verts[14]);
-	glm::mat4 a2m = MVa * glm::translate(glm::mat4(1.f), (v1 - v2));
+	v1 = glm::vec3(0, 0, a->verts[2]);
+	v2 = glm::vec3(0, 0, a->verts[23]);
+	glm::vec3 a2 = (v1 - v2);
 
+	v1 = glm::vec3(b->verts[0], 0, 0);
+	v2 = glm::vec3(b->verts[21], 0, 0);
+	glm::mat4 b0m = glm::translate(glm::mat4(1.f), (v1 - v2))*MVa;
 
-	glm::vec3 a0 = glm::vec3(a0m[3][0], a0m[3][1], a0m[3][2]);
-	glm::vec3 a1 = glm::vec3(a1m[3][0], a1m[3][1], a1m[3][2]);
-	glm::vec3 a2 = glm::vec3(a2m[3][0], a2m[3][1], a2m[3][2]);
+	v1 = glm::vec3(0, b->verts[1], 0);
+	v2 = glm::vec3(0, b->verts[22], 0);
+	glm::mat4 b1m = glm::translate(glm::mat4(1.f), (v1 - v2))*MVa;
 
-
-	//minAll to maxx, miny, minz
-	v1 = glm::vec3(b->verts[0], b->verts[1], b->verts[2]);
-	v2 = glm::vec3(b->verts[9], b->verts[10], b->verts[11]);
-	glm::mat4 b0m = MVb * glm::translate(glm::mat4(1.f), (v1 - v2));
-
-	//minAll to minx, maxy, minz
-	v1 = glm::vec3(b->verts[0], b->verts[1], b->verts[2]);
-	v2 = glm::vec3(b->verts[3], b->verts[4], b->verts[5]);
-	glm::mat4 b1m = MVb * glm::translate(glm::mat4(1.f), (v1 - v2));
-
-	//minAll to minx, miny, maxz
-	v1 = glm::vec3(b->verts[0], b->verts[1], b->verts[2]);
-	v2 = glm::vec3(b->verts[12], b->verts[13], b->verts[14]);
-	glm::mat4 b2m = MVb * glm::translate(glm::mat4(1.f), (v1 - v2));
+	v1 = glm::vec3(0, 0, b->verts[2]);
+	v2 = glm::vec3(0, 0, b->verts[23]);
+	glm::mat4 b2m = glm::translate(glm::mat4(1.f), (v1 - v2))*MVa;
 
 	glm::vec3 b0 = glm::vec3(b0m[3][0], b0m[3][1], b0m[3][2]);
 	glm::vec3 b1 = glm::vec3(b1m[3][0], b1m[3][1], b1m[3][2]);
 	glm::vec3 b2 = glm::vec3(b2m[3][0], b2m[3][1], b2m[3][2]);
+
 
 	glm::vec3 axis7 = glm::cross(a0, b0);
 	glm::vec3 axis8 = glm::cross(a0, b1);

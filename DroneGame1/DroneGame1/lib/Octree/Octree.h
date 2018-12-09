@@ -10,7 +10,7 @@ using namespace std;
 
 class Shader;
 
-#define MAX_DEPTH  3
+#define MAX_DEPTH  1
 
 class Octree
 {

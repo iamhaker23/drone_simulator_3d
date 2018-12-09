@@ -20,6 +20,7 @@ public:
 	bool gravity;
 	glm::vec3 forces;
 	glm::vec3 oldForces;
+	glm::vec3 collisionForces;
 	bool createsLift;
 
 	inline Physics() {

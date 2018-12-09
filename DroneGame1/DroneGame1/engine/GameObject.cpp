@@ -100,8 +100,8 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 
 	if (!physics->ghost) {
 		vector<glm::vec3> forcesFromCollisions = getForcesFromCollisions(colliders);
-		glm::vec3 overrideForce = resolveForces(forcesFromCollisions);
-		if (overrideForce.x != 0 || overrideForce.y != 0 || overrideForce.z != 0) {
+		physics->collisionForces += resolveForces(forcesFromCollisions);
+		if (physics->collisionForces.x != 0 || physics->collisionForces.y != 0 || physics->collisionForces.z != 0) {
 			//if cross product <= max && >= -max then ADD
 			/*
 			glm::vec3 cross = glm::cross(overrideForce, physics->forces);
@@ -111,10 +111,9 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 			*/
 			//physics->forces = overrideForce;
 
-			
-			this->localX += overrideForce[0];
-			this->localY += overrideForce[1];
-			this->localZ += overrideForce[2];
+			this->localX += physics->collisionForces[0] * 0.5f;
+			this->localY += physics->collisionForces[1] * 0.5f;
+			this->localZ += physics->collisionForces[2] * 0.5f;
 
 		}
 	}
@@ -122,6 +121,7 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 
 	physics->oldForces = glm::vec3(physics->forces);
 	physics->forces = glm::vec3(0.f, 0.f, 0.f);
+	physics->collisionForces = glm::vec3(0.f, 0.f, 0.f);
 }
 
 
@@ -145,48 +145,53 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 		glm::vec3 distVector = glm::vec3(a->worldX, a->worldY, a->worldZ) - glm::vec3(b->worldX, b->worldY, b->worldZ);
 		float distSqr = (distVector.x*distVector.x) + (distVector.y*distVector.y) + (distVector.z*distVector.z);
 
-		//if (distSqr <= coverageSqr/2.0f) {
+		if (true || distSqr <= coverageSqr / 2.0f) {
 
 			//Sphere only collisions
 			//hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
 
 			if (name == "Drone1" && b->name == "Tardis") {
 				if (a->oldMV != a->worldPositionMatrix || b->oldMV != b->worldPositionMatrix) {
-
-					glm::vec3 oldMVPosa = glm::vec3(a->oldMV[3][0], a->oldMV[3][1], a->oldMV[3][2]);
-					glm::vec3 oldMVPosb = glm::vec3(b->oldMV[3][0], b->oldMV[3][1], b->oldMV[3][2]);
-
-					//has moved far enough
-					glm::vec3 diffA = (glm::vec3(a->worldX, a->worldY, a->worldZ) - oldMVPosa) - a->oldNear;
-					glm::vec3 diffB = (glm::vec3(b->worldX, b->worldY, b->worldZ) - oldMVPosa) - b->oldNear;
-					float distanceMovedRelativeToRequiredA = (diffA.x*diffA.x) + (diffA.y*diffA.y) + (diffA.z*diffA.z);
-					float distanceMovedRelativeToRequiredB = (diffB.x*diffB.x) + (diffB.y*diffB.y) + (diffB.z*diffB.z);
-					if (distanceMovedRelativeToRequiredA >= 0.f || distanceMovedRelativeToRequiredB >= 0.f) {
-
-						//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)));
-						glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix);
-						//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix);
-						
-						//if (Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.0f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.0f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix)) {
-						//if (Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)))) {
-						//if (Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix)) {
-						if (hitPoint.x != 0.f || hitPoint.y != 0.f || hitPoint.z != 0.f) {
-							hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
-						}
-						else {
-							a->oldMV = a->worldPositionMatrix;
-							b->oldMV = b->worldPositionMatrix;
-
-							a->oldNear = glm::vec3(b->worldX, b->worldY, b->worldZ) - glm::vec3(a->worldX, a->worldY, a->worldZ);
-							b->oldNear = glm::vec3(a->worldX, a->worldY, a->worldZ) - glm::vec3(b->worldX, b->worldY, b->worldZ);
-
-						}
-
+					
+					
+					/*
+					BACKUP
+					//if (Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix, true) ) {
+					if ( Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)),true)){
+						hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
 					}
+					else {
+						//need to move to enable collisions again
+
+						a->oldMV = a->worldPositionMatrix;
+						b->oldMV = b->worldPositionMatrix;
+					}
+					*/
+					
+					
+					//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)));
+					//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix);
+					glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix);
+					
+					//if (Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.0f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.0f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix)) {
+					//if (Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)))) {
+					//if (Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix)) {
+					if (hitPoint.x != 0.f || hitPoint.y != 0.f || hitPoint.z != 0.f) {
+						
+						//hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
+						hits.push_back(hitPoint);
+					}
+					else {
+						//need to move to enable collisions again
+
+						a->oldMV = a->worldPositionMatrix;
+						b->oldMV = b->worldPositionMatrix;
+					}
+					/**/
+
 				}
 			}
-		//}
-
+		}
 	}
 
 	return hits;
@@ -224,14 +229,15 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 				vector<glm::vec3> hitPositions = GameObject::getHitPositions(this, other);
 
 				if ((int)hitPositions.size() > 0) {
-					glm::vec3 collisionForce = glm::vec3((hitPositions[0].x - otherWorld.x), (hitPositions[0].y - otherWorld.y), (hitPositions[0].z - otherWorld.z));
-					
-					
+					glm::vec3 collisionForce = glm::vec3((myWorld.x - otherWorld.x), (myWorld.y - otherWorld.y), (myWorld.z - otherWorld.z));
+					//glm::vec3 collisionForce = glm::vec3((hitPositions[0].x - otherWorld.x), (hitPositions[0].y - otherWorld.y), (hitPositions[0].z - otherWorld.z));
+					//glm::vec3 collisionForce = glm::vec3((myWorld.x - hitPositions[0].x), (myWorld.y - hitPositions[0].y), (myWorld.z - hitPositions[0].z));
 					if (collisionForce.x != 0.f || collisionForce.y != 0.f || collisionForce.z != 0.f) {
-						
 						forceList.push_back(glm::normalize(collisionForce));
 						//temporary way of applying force to other
-						//other->physics->forces -= glm::normalize(collisionForce);
+						other->physics->collisionForces -= glm::normalize(collisionForce)*0.5f;
+					//if (hitPositions[0].x != 0.f || hitPositions[0].y != 0.f || hitPositions[0].z != 0.f) {
+						//forceList.push_back(glm::normalize(-hitPositions[0]));
 					}
 				}
 			}
