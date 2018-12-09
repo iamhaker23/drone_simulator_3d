@@ -113,14 +113,28 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 	
 	vector<glm::vec3> hits = vector<glm::vec3>();
-	Octree* aOct = GameObject::modelList[a->modelIdx]->octree;
-	Octree* bOct = GameObject::modelList[b->modelIdx]->octree;
-
+	
 	if (a->name == "Drone1" && b->name == "Tardis") {
+
+		Octree* aOct = GameObject::modelList[a->modelIdx]->octree;
+		Octree* bOct = GameObject::modelList[b->modelIdx]->octree;
+
+		/*
 		if (Collisions::doSAT(aOct, bOct, a->modelViewMatrix)) {
 			hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
 		}
-		
+		*/
+		glm::vec3 aLargestExtent = glm::vec3(aOct->box->verts[21], aOct->box->verts[22], aOct->box->verts[23]) - glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2])/2.f;
+		glm::vec3 bLargestExtent = glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2])/2.f;
+		float coverageSqr = ((aLargestExtent.x*aLargestExtent.x) + (aLargestExtent.x*aLargestExtent.x) + (aLargestExtent.x*aLargestExtent.x))
+			+ ((bLargestExtent.x*bLargestExtent.x) + (bLargestExtent.x*bLargestExtent.x) + (bLargestExtent.x*bLargestExtent.x));
+		glm::vec3 distVector = glm::vec3(a->worldX, a->worldY, a->worldZ) - glm::vec3(b->worldX, b->worldY, b->worldZ);
+		float distSqr = (distVector.x*distVector.x) + (distVector.y*distVector.y) + (distVector.z*distVector.z);
+
+		if (distSqr <= coverageSqr) {
+			hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
+		}
+
 	}
 
 	return hits;

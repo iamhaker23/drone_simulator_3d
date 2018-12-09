@@ -45,8 +45,11 @@ bool Collisions::SAT(Box* a, Box* b, glm::mat4 MVa) {
 	return true;
 }
 
-bool Collisions::overlap(float a[], float b[]) {
-	return a[0] - b[1] < 0 || a[1] - b[0] < 0;
+bool Collisions::overlap(float a[], float b[]){
+	float coverage = ((a[1] > b[1]) ? a[1] : b[1]) - ((a[0] < b[0]) ? a[0] : b[0]);
+	float summation = (a[1] - a[0]) + (b[1] - b[0]);
+	return coverage <= summation;
+
 }
 
 void Collisions::projectBox(float minMax[], Box* a, glm::vec3 axis) {
