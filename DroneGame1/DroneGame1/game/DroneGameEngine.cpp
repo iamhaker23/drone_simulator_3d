@@ -23,7 +23,8 @@ void DroneGameEngine::init() {
 	drone->material->normalMapping = 1;
 	
 	GameObject* tardis = new GameObject("Tardis", "Assets/models/tardis_1.obj", "Assets/glslfiles/basicTransformations", true);
-	tardis->localY = -10.f;
+	tardis->worldY = -10.f;
+	tardis->worldX = -20.f;
 	tardis->material->normalMapping = 1;
 	tardis->radius = 5.0f;
 	tardis->physics = new Physics(1.0f, 1.0f, 0.1f, false, true, false);
@@ -33,13 +34,14 @@ void DroneGameEngine::init() {
 	misc1->worldX = 5.f;
 	misc1->scale = 5.0f;
 	misc1->radius = 25.f;
+	misc1->physics = new Physics();
 
 	misc1->material->shininess = 0.5f;
 	misc1->material->normalMapping = 1;
 
-	GameObject* sky_clouds = new GameObject("Clouds", "Assets/models/sky/clouds.obj", "Assets/glslfiles/basicTransformations", true);
-	GameObject* sky_stars = new GameObject("Clouds", "Assets/models/sky/stars.obj", "Assets/glslfiles/basicTransformations", true);
-	GameObject* sky_col = new GameObject("Clouds", "Assets/models/sky/sky.obj", "Assets/glslfiles/basicTransformations", true);
+	GameObject* sky_clouds = new GameObject("SkyClouds", "Assets/models/sky/clouds.obj", "Assets/glslfiles/basicTransformations", true);
+	GameObject* sky_stars = new GameObject("SkyStars", "Assets/models/sky/stars.obj", "Assets/glslfiles/basicTransformations", true);
+	GameObject* sky_col = new GameObject("SkyHorizon", "Assets/models/sky/sky.obj", "Assets/glslfiles/basicTransformations", true);
 	sky_clouds->material->shadeless = 1;
 	sky_stars->material->shadeless = 1;
 	sky_col->material->shadeless = 1;
@@ -64,8 +66,9 @@ void DroneGameEngine::init() {
 	myScene->addObject(sky_col);
 	
 	GameObject* terrain_1 = new GameObject("Terrain", "Assets/models/terrain_1.obj", "Assets/glslfiles/basicTransformations", true);
-	terrain_1->worldY = -30.f;
+	terrain_1->worldY = -5.f;
 	terrain_1->scale = 10.0f;
+	terrain_1->physics = new Physics();
 	//terrain_1->material->shadeless = 1;
 
 	myScene->addObject(terrain_1);
@@ -228,7 +231,7 @@ void DroneGameEngine::processKeys()
 		bool drawDebug = input_manager->isInputActivated(VK_F1);
 
 		if (input_manager->isInputActivated(VK_F2)) {
-			firstObject->physics->dynamic = !firstObject->physics->dynamic;
+			firstObject->physics->gravity = !firstObject->physics->gravity;
 		}
 
 

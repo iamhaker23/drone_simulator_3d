@@ -26,7 +26,7 @@ private:
 public:
 	Box();
 	Shader* shader;
-
+	
 	float verts[NumberOfVertexCoords];
 	void constructGeometry(Shader* myShader, float minx, float miny, float minz, float maxx, float maxy, float maxz);
 	void render(Shader* myShader); 

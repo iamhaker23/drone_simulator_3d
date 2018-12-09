@@ -48,6 +48,14 @@ void Scene::resizeCameras(GLfloat width, GLfloat height) {
 	}
 }
 
+void Scene::update() {
+
+	for (int i = 0; i < (int)objects.size(); i++) {
+		objects[i]->doCollisionsAndApplyForces(objects);
+	}
+
+}
+
 void Scene::draw() {
 	if (activeCamera == -1 || (int)Cameras::cameras.size() <= activeCamera){
 		return;

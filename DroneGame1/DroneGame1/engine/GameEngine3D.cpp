@@ -67,12 +67,16 @@ void GameEngine3D::init()
 
 void GameEngine3D::update()
 {
+	//TODO: WHY DOES THIS NOT WORK!?
+	//scene_manager->updateActive();
+
+	GameObject::collisionsResolved.clear();
+
 	current_scene = scene_manager->getActiveScene();
 	vector<GameObject*> current_scene_objects = current_scene->getGameObjects();
 	for (int i = 0; i < (int)current_scene_objects.size(); i++) {
 		current_scene_objects[i]->doCollisionsAndApplyForces(current_scene_objects);
 	}
-
 
 }
 

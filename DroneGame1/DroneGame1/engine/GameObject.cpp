@@ -18,6 +18,8 @@ vector<ThreeDModel*> GameObject::modelList;
 map<int, string> GameObject::shadersLoaded = {};
 map<int, string> GameObject::modelsLoaded = {};
 int GameObject::debugShader = -1;
+
+vector<string> GameObject::collisionsResolved;
 float GameObject::yAxisFloor = -30.0f;
 
 
@@ -47,6 +49,8 @@ GameObject::GameObject() {
 	worldPositionMatrix = glm::translate(glm::mat4(1.0), glm::vec3(worldX, worldY, worldZ));
 	viewMatrix = glm::mat4();
 	modelViewMatrix = glm::mat4();
+	oldMV = glm::mat4();
+
 	projectionMatrix = glm::mat4();
 
 	parent = NULL;
@@ -72,6 +76,28 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 		return;
 	}
 
+
+	if (physics->createsLift) {
+		float speedSqrd = (physics->forces[0] * physics->forces[0]) + (physics->forces[1] * physics->forces[1]) + (physics->forces[2] * physics->forces[2]);
+		float lift = (5.f * physics->mass) * ((speedSqrd > 0.f) ? speedSqrd : 0.f);
+		this->worldY += lift;
+		//TODO: the lift should be the world-space vector projected onto local y-axis
+		physics->forces[1] += lift;
+	}
+
+	if (physics->gravity) {
+		float gravity = 0.1f * physics->mass;
+		this->worldY -= gravity;
+	}
+	
+	if (physics->dynamic) {
+
+		this->localX += physics->forces[0];
+		this->localY += physics->forces[1];
+		this->localZ += physics->forces[2];
+	}
+
+
 	if (!physics->ghost) {
 		vector<glm::vec3> forcesFromCollisions = getForcesFromCollisions(colliders);
 		glm::vec3 overrideForce = resolveForces(forcesFromCollisions);
@@ -83,27 +109,16 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 			float lengthSqrd = (cross.x*cross.x) + (cross.y*cross.y) + (cross.z*cross.z);
 			physics->forces = (lengthSqrd <= 0.6f) ? overrideForce : physics->forces + overrideForce;
 			*/
-			physics->forces = overrideForce;
+			//physics->forces = overrideForce;
+
+			
+			this->localX += overrideForce[0];
+			this->localY += overrideForce[1];
+			this->localZ += overrideForce[2];
 
 		}
 	}
 
-	if (physics->createsLift) {
-		float speedSqrd = (physics->forces[0] * physics->forces[0]) + (physics->forces[1] * physics->forces[1]) + (physics->forces[2] * physics->forces[2]);
-		float lift = (5.f * physics->mass) * ((speedSqrd > 0.f) ? speedSqrd : 0.f);
-		this->worldY += lift;
-		//TODO: the lift should be the world-space vector projected onto local y-axis
-		physics->forces[1] += lift;
-	}
-
-	if (physics->dynamic) {
-		float gravity = 0.1f * physics->mass;
-		this->worldY -= gravity;
-	}
-	
-	this->localX += physics->forces[0];
-	this->localY += physics->forces[1];
-	this->localZ += physics->forces[2];
 
 	physics->oldForces = glm::vec3(physics->forces);
 	physics->forces = glm::vec3(0.f, 0.f, 0.f);
@@ -113,27 +128,64 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 	
 	vector<glm::vec3> hits = vector<glm::vec3>();
-	
-	if (a->name == "Drone1" && b->name == "Tardis") {
+		
+	//if a will be affected by a collision
+	if (a->physics->dynamic || b->physics->dynamic){//a->name == "Drone1" && b->name == "Tardis") {
 
 		Octree* aOct = GameObject::modelList[a->modelIdx]->octree;
 		Octree* bOct = GameObject::modelList[b->modelIdx]->octree;
 
-		/*
-		if (Collisions::doSAT(aOct, bOct, a->modelViewMatrix)) {
-			hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
-		}
-		*/
-		glm::vec3 aLargestExtent = glm::vec3(aOct->box->verts[21], aOct->box->verts[22], aOct->box->verts[23]) - glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2])/2.f;
-		glm::vec3 bLargestExtent = glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2])/2.f;
+		ThreeDModel* aModel = GameObject::modelList[a->modelIdx];
+		ThreeDModel* bModel = GameObject::modelList[b->modelIdx];
+
+		glm::vec3 aLargestExtent = a->scale * glm::vec3(aOct->box->verts[21], aOct->box->verts[22], aOct->box->verts[23]) - glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2]);
+		glm::vec3 bLargestExtent = b->scale *  glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]);
 		float coverageSqr = ((aLargestExtent.x*aLargestExtent.x) + (aLargestExtent.x*aLargestExtent.x) + (aLargestExtent.x*aLargestExtent.x))
 			+ ((bLargestExtent.x*bLargestExtent.x) + (bLargestExtent.x*bLargestExtent.x) + (bLargestExtent.x*bLargestExtent.x));
 		glm::vec3 distVector = glm::vec3(a->worldX, a->worldY, a->worldZ) - glm::vec3(b->worldX, b->worldY, b->worldZ);
 		float distSqr = (distVector.x*distVector.x) + (distVector.y*distVector.y) + (distVector.z*distVector.z);
 
-		if (distSqr <= coverageSqr) {
-			hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
-		}
+		//if (distSqr <= coverageSqr/2.0f) {
+
+			//Sphere only collisions
+			//hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
+
+			if (name == "Drone1" && b->name == "Tardis") {
+				if (a->oldMV != a->worldPositionMatrix || b->oldMV != b->worldPositionMatrix) {
+
+					glm::vec3 oldMVPosa = glm::vec3(a->oldMV[3][0], a->oldMV[3][1], a->oldMV[3][2]);
+					glm::vec3 oldMVPosb = glm::vec3(b->oldMV[3][0], b->oldMV[3][1], b->oldMV[3][2]);
+
+					//has moved far enough
+					glm::vec3 diffA = (glm::vec3(a->worldX, a->worldY, a->worldZ) - oldMVPosa) - a->oldNear;
+					glm::vec3 diffB = (glm::vec3(b->worldX, b->worldY, b->worldZ) - oldMVPosa) - b->oldNear;
+					float distanceMovedRelativeToRequiredA = (diffA.x*diffA.x) + (diffA.y*diffA.y) + (diffA.z*diffA.z);
+					float distanceMovedRelativeToRequiredB = (diffB.x*diffB.x) + (diffB.y*diffB.y) + (diffB.z*diffB.z);
+					if (distanceMovedRelativeToRequiredA >= 0.f || distanceMovedRelativeToRequiredB >= 0.f) {
+
+						//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)));
+						glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix);
+						//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix);
+						
+						//if (Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.0f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.0f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix)) {
+						//if (Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)))) {
+						//if (Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix)) {
+						if (hitPoint.x != 0.f || hitPoint.y != 0.f || hitPoint.z != 0.f) {
+							hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
+						}
+						else {
+							a->oldMV = a->worldPositionMatrix;
+							b->oldMV = b->worldPositionMatrix;
+
+							a->oldNear = glm::vec3(b->worldX, b->worldY, b->worldZ) - glm::vec3(a->worldX, a->worldY, a->worldZ);
+							b->oldNear = glm::vec3(a->worldX, a->worldY, a->worldZ) - glm::vec3(b->worldX, b->worldY, b->worldZ);
+
+						}
+
+					}
+				}
+			}
+		//}
 
 	}
 
@@ -142,6 +194,7 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 
 vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> colliders) {
 	vector<glm::vec3> forceList = {};
+	if (physics == NULL) return forceList;
 
 	ThreeDModel* myModel = GameObject::modelList[modelIdx];
 	glm::vec3 myWorld = glm::vec3(worldX, worldY, worldZ);
@@ -150,20 +203,39 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 		GameObject* other = colliders[i];
 
 		if (other->name != name && other->physics != NULL) {
-			ThreeDModel* otherModel = GameObject::modelList[other->modelIdx];
-			glm::vec3 otherWorld = glm::vec3(other->worldX, other->worldY, other->worldZ);// *modelViewMatrix;
 
-			vector<glm::vec3> hitPositions = GameObject::getHitPositions(this, other);
-				
-			
-
-			if ((int)hitPositions.size() > 0){
-				glm::vec3 collisionForce = glm::vec3((hitPositions[0].x - otherWorld.x), (hitPositions[0].y - otherWorld.y), (hitPositions[0].z - otherWorld.z));
-				if (collisionForce.x != 0.f || collisionForce.y != 0.f || collisionForce.z != 0.f) {
-					forceList.push_back(glm::normalize(collisionForce));
+			//quick check if the collision is already resolved
+			bool resolved = false;
+			for (int collRes = 0; collRes < (int)GameObject::collisionsResolved.size(); collRes++) {
+				if (GameObject::collisionsResolved[collRes] == (other->name + name)) {
+					//cout << "COLLISION CULL" << GameObject::collisionsResolved[collRes]  << endl;
+					resolved = true;
+					break;
 				}
 			}
 			
+			if (!resolved) {
+
+				collisionsResolved.push_back(name + other->name);
+
+				ThreeDModel* otherModel = GameObject::modelList[other->modelIdx];
+				glm::vec3 otherWorld = glm::vec3(other->worldX, other->worldY, other->worldZ);// *modelViewMatrix;
+
+				vector<glm::vec3> hitPositions = GameObject::getHitPositions(this, other);
+
+				if ((int)hitPositions.size() > 0) {
+					glm::vec3 collisionForce = glm::vec3((hitPositions[0].x - otherWorld.x), (hitPositions[0].y - otherWorld.y), (hitPositions[0].z - otherWorld.z));
+					
+					
+					if (collisionForce.x != 0.f || collisionForce.y != 0.f || collisionForce.z != 0.f) {
+						
+						forceList.push_back(glm::normalize(collisionForce));
+						//temporary way of applying force to other
+						//other->physics->forces -= glm::normalize(collisionForce);
+					}
+				}
+			}
+
 		}
 
 	}
@@ -256,7 +328,10 @@ GameObject::GameObject(string name, string modelPath, string shaderPath, bool in
 
 	worldPositionMatrix = glm::translate(glm::mat4(1.0), glm::vec3(worldX, worldY, worldZ));
 	viewMatrix = glm::mat4();
+	
 	modelViewMatrix = glm::mat4();
+	oldMV = glm::mat4();
+
 	projectionMatrix = glm::mat4();
 
 	if (GameObject::debugShader == -1) {
@@ -276,7 +351,10 @@ GameObject::GameObject(string name, string modelPath, string shaderPath, bool in
 	if (modelIdx == -1) {
 		modelIdx = doModelLoad(modelPath, shaderIdx);
 	}
-	
+
+	Octree* myOct = GameObject::modelList[modelIdx]->octree;
+	glm::vec3 myDiagonalExtent = (glm::vec3(myOct->box->verts[21], myOct->box->verts[22], myOct->box->verts[23]) - glm::vec3(myOct->box->verts[0], myOct->box->verts[1], myOct->box->verts[2]));
+	this->extent = glm::distance(myDiagonalExtent, glm::vec3(0));
 
 }
 
@@ -311,6 +389,7 @@ GameObject::GameObject(const GameObject & copy) {
 
 	this->inheritRotation = copy.inheritRotation;
 	this->modelViewMatrix = copy.modelViewMatrix;
+	this->oldMV = copy.oldMV;
 	this->viewMatrix = copy.viewMatrix;
 	this->projectionMatrix = copy.projectionMatrix;
 	this->worldPositionMatrix = copy.worldPositionMatrix;
@@ -387,7 +466,7 @@ void GameObject::updateTransformation() {
 	worldY = modelViewMatrix[3][1];
 	worldZ = modelViewMatrix[3][2];
 
-	if (worldY <= GameObject::yAxisFloor) worldY = GameObject::yAxisFloor;
+	if (physics != NULL && physics->gravity && worldY <= GameObject::yAxisFloor+this->extent) worldY = GameObject::yAxisFloor + this->extent;
 
 }
 
@@ -472,7 +551,6 @@ void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix) {
 		Shader* debugShader = GameObject::shaderList[GameObject::debugShader];
 
 		glUseProgram(debugShader->handle());  // use the shader
-
 
 		glUniformMatrix4fv(glGetUniformLocation(debugShader->handle(), "ModelViewMatrix"), 1, GL_FALSE, &eyeSpace[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(debugShader->handle(), "ProjectionMatrix"), 1, GL_FALSE, &projectionMatrix[0][0]);

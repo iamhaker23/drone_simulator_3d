@@ -37,6 +37,7 @@ private:
 	int modelIdx;
 
 	static float GameObject::yAxisFloor;
+	float extent = 0.f;
 
 public:
 	float slowParentFactor;
@@ -44,6 +45,9 @@ public:
 	glm::mat4 modelViewMatrix;
 	glm::mat4 viewMatrix;
 	glm::mat4 projectionMatrix;
+
+	glm::mat4 oldMV;
+	glm::vec3 oldNear;
 	
 	GameObject* parent;
 	bool inheritRotation = false;
@@ -68,6 +72,7 @@ public:
 	bool drawBounds = false, drawOctree = false;
 	float scale = 1.0f;
 
+	static vector<string> GameObject::collisionsResolved;
 	string name;
 
 	vector<glm::vec3> getForcesFromCollisions(vector<GameObject*> colliders);

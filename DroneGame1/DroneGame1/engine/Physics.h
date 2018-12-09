@@ -17,6 +17,7 @@ public:
 	float collisionMargin;
 	bool ghost;
 	bool dynamic;
+	bool gravity;
 	glm::vec3 forces;
 	glm::vec3 oldForces;
 	bool createsLift;
@@ -27,7 +28,8 @@ public:
 		this->frictionCoefficient = 1.0f;
 		this->collisionMargin = 0.1f;
 		this->ghost = false;
-		this->dynamic = true;
+		this->dynamic = false;
+		this->gravity = false;
 		this->createsLift = false;
 	}
 
@@ -38,7 +40,10 @@ public:
 		this->frictionCoefficient = fric;
 		this->collisionMargin = collMargin;
 		this->ghost = ghost;
+		
 		this->dynamic = dynamic;
+		this->gravity = dynamic;
+
 		this->createsLift = createsLift;
 	}
 

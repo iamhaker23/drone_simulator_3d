@@ -17,7 +17,12 @@ class Octree
 private:
 	double minX, minY, minZ, maxX, maxY, maxZ;
 	Octree* children[8];
-	int Level;	
+
+
+public:
+
+
+	int Level;
 	int* PrimitiveList;
 	int PrimitiveListSize;
 
@@ -25,7 +30,6 @@ private:
 	int VertexListSize;
 
 
-public:
 	Box* box;
 	Shader* shader;
 

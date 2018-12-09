@@ -1,7 +1,6 @@
 #ifndef _threeDMODEL_H
 #define _threeDMODEL_H
 
-
 #include "..//3DStruct//BoundingBox.h"
 #include "..//Structures//Vector3d.h"
 #include "..//Structures//Vector2d.h"
