@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClInclude Include="engine\Camera.h" />
     <ClInclude Include="engine\Cameras.h" />
+    <ClInclude Include="engine\Collisions.h" />
     <ClInclude Include="engine\GameEngine3D.h" />
     <ClInclude Include="engine\GameEngine.h" />
     <ClInclude Include="engine\GameObject.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="DroneGame1.cpp" />
     <ClCompile Include="engine\Camera.cpp" />
     <ClCompile Include="engine\Cameras.cpp" />
+    <ClCompile Include="engine\Collisions.cpp" />
     <ClCompile Include="engine\GameEngine3D.cpp" />
     <ClCompile Include="engine\GameEngine.cpp" />
     <ClCompile Include="engine\GameObject.cpp" />

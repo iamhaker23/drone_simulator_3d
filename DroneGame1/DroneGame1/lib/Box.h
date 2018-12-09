@@ -20,13 +20,17 @@ private:
 	static int numOfVerts;
 	static int numOfTris;
 
-	float verts[NumberOfVertexCoords];
 	float cols[NumberOfVertexCoords];
 	unsigned int tris[NumberOfTriangleIndices];
+
 public:
 	Box();
+	Shader* shader;
+
+	float verts[NumberOfVertexCoords];
 	void constructGeometry(Shader* myShader, float minx, float miny, float minz, float maxx, float maxy, float maxz);
-	void render(Shader* myShader);
+	void render(Shader* myShader); 
+	void setShader(Shader* myShader);
 };
 
 #endif _BOX_H

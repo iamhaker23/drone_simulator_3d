@@ -15,6 +15,7 @@
 #include "Material.h"
 #include "Light.h"
 #include "../lib/Octree/Octree.h"
+#include "Collisions.h"
 
 #include <map>
 

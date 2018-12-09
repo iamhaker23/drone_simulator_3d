@@ -207,7 +207,7 @@ void ThreeDModel::drawBoundingBox(Shader* myShader)
 {
 	if(octree!=NULL)
 	{
-		//octree->drawBoundingBox(myShader);
+		octree->drawBoundingBox(myShader);
 		octree->drawAllBoxes(myShader);
 	}
 }

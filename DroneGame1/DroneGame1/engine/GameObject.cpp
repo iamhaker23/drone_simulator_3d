@@ -75,7 +75,7 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 	if (!physics->ghost) {
 		vector<glm::vec3> forcesFromCollisions = getForcesFromCollisions(colliders);
 		glm::vec3 overrideForce = resolveForces(forcesFromCollisions);
-		if (overrideForce.x != 0 && overrideForce.y != 0 && overrideForce.z != 0) {
+		if (overrideForce.x != 0 || overrideForce.y != 0 || overrideForce.z != 0) {
 			//if cross product <= max && >= -max then ADD
 			/*
 			glm::vec3 cross = glm::cross(overrideForce, physics->forces);
@@ -116,7 +116,12 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 	Octree* aOct = GameObject::modelList[a->modelIdx]->octree;
 	Octree* bOct = GameObject::modelList[b->modelIdx]->octree;
 
-
+	if (a->name == "Drone1" && b->name == "Tardis") {
+		if (Collisions::doSAT(aOct, bOct, a->modelViewMatrix)) {
+			hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
+		}
+		
+	}
 
 	return hits;
 }
@@ -125,41 +130,28 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 	vector<glm::vec3> forceList = {};
 
 	ThreeDModel* myModel = GameObject::modelList[modelIdx];
-	//glm::vec4 myWorld = glm::vec4(worldX, worldY, worldZ, 1.f);
 	glm::vec3 myWorld = glm::vec3(worldX, worldY, worldZ);
 
 	for (int i = 0; i < (int)colliders.size(); i++) {
 		GameObject* other = colliders[i];
+
 		if (other->name != name && other->physics != NULL) {
 			ThreeDModel* otherModel = GameObject::modelList[other->modelIdx];
-			//glm::vec4 otherWorld = glm::vec4(other->worldX, other->worldY, other->worldZ, 1.f);// *modelViewMatrix;
 			glm::vec3 otherWorld = glm::vec3(other->worldX, other->worldY, other->worldZ);// *modelViewMatrix;
 
-			/*float verts[] = { 0.f, 0.f, 0.f,
-						myWorld.x,myWorld.y,myWorld.z,
-						otherWorld.x,otherWorld.y,otherWorld.z };
-			int triIdx[] = { 0, 1, 2 };
-			debugDraw(verts, 3, triIdx, 1, tmpVaoId == 0);
-			*/
-
-			float diff = ((myWorld.x - otherWorld.x)*(myWorld.x - otherWorld.x)) +
-				((myWorld.y - otherWorld.y)*(myWorld.y - otherWorld.y)) +
-				((myWorld.z - otherWorld.z)*(myWorld.z - otherWorld.z));
-
-			if (diff < ((radius)+other->radius)*(radius + other->radius) ){//(r+r)^2 
+			vector<glm::vec3> hitPositions = GameObject::getHitPositions(this, other);
 				
-				vector<glm::vec3> hitPositions = GameObject::getHitPositions(this, other);
-				
-				for (int i = 0; i < (int)hitPositions.size(); i++){
-					glm::vec3 collisionForce = glm::vec3((hitPositions[i].x - otherWorld.x), (hitPositions[i].y - otherWorld.y), (hitPositions[i].z - otherWorld.z));
-					if (collisionForce.x != 0.f && collisionForce.y != 0.f && collisionForce.z != 0.f) forceList.push_back(glm::normalize(collisionForce)*((radius) / diff));
+			
+
+			if ((int)hitPositions.size() > 0){
+				glm::vec3 collisionForce = glm::vec3((hitPositions[0].x - otherWorld.x), (hitPositions[0].y - otherWorld.y), (hitPositions[0].z - otherWorld.z));
+				if (collisionForce.x != 0.f || collisionForce.y != 0.f || collisionForce.z != 0.f) {
+					forceList.push_back(glm::normalize(collisionForce));
 				}
 			}
-
-			//projection of edge is dot(edge, axis)
-			//if projections overlap 
-
+			
 		}
+
 	}
 
 	return forceList;
@@ -474,7 +466,6 @@ void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix) {
 		glUniform1f(scaleLocation, scale);
 
 		if (drawBounds) modelHandle->drawBoundingBox(debugShader);
-		if (drawOctree) modelHandle->drawOctreeLeaves(debugShader);
 	}
 }
 

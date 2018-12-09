@@ -21,8 +21,13 @@ public:
 #include "Collisions.h"
 
 	static bool Collisions::doSAT(Octree* a, Octree* b, glm::mat4 MVa);
-	static bool Collisions::overlap(float* a, float* b);
-	static float* Collisions::projectBox(Box* a, glm::vec3 axis);
+	static bool Collisions::SAT(Box* a, Box* b, glm::mat4 MVa);
+	
+	static bool Collisions::overlap(float a[], float b[]);
+
+	static void projectBox(float minMax[], Box* a, glm::vec3 axis);
+	static void projectBox(float minMax[], Box* a, glm::vec3 axis, glm::mat4 MVa);
+
 	static vector<glm::vec3> Collisions::getAxes(Box* a, Box* b, glm::mat4 MVa);
 };
 

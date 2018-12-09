@@ -27,6 +27,7 @@ private:
 
 public:
 	Box* box;
+	Shader* shader;
 
 	Octree();
 	~Octree();

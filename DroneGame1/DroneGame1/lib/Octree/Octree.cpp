@@ -32,7 +32,7 @@ Octree::Octree()
 		children[i] = NULL;
 	}
 
-	box = NULL;
+	box = new Box();
 }
 
 Octree::~Octree()
@@ -76,6 +76,9 @@ void Octree::set(int L, double x, double y, double z, double X, double Y, double
 	maxY = Y;
 	maxZ = Z;
 
+	box = new Box();
+	box->constructGeometry(NULL, static_cast<float>(minX), static_cast<float>(minY), static_cast<float>(minZ), static_cast<float>(maxX), static_cast<float>(maxY), static_cast<float>(maxZ));
+
 	if(PrimListSize>0)
 	{
 		PrimitiveListSize = PrimListSize;
@@ -110,6 +113,9 @@ void Octree::start(int L, double x, double y, double z, double X, double Y, doub
 	maxX = X;
 	maxY = Y;
 	maxZ = Z;
+
+	box = new Box();
+	box->constructGeometry(NULL, static_cast<float>(minX), static_cast<float>(minY), static_cast<float>(minZ), static_cast<float>(maxX), static_cast<float>(maxY), static_cast<float>(maxZ));
 
 	PrimitiveListSize = obj->getOctreePrimitiveListSize();
 
@@ -483,8 +489,11 @@ void Octree::drawBoundingBox(Shader* myShader)
 		box = new Box();
 		box->constructGeometry(myShader, static_cast<float>(minX), static_cast<float>(minY), static_cast<float>(minZ), static_cast<float>(maxX), static_cast<float>(maxY), static_cast<float>(maxZ));
 	}
-	else
-	{
+	else {
+		if (box->shader == NULL) {
+			box->setShader(myShader);
+		}
+
 		box->render(myShader);
 	}
 }
