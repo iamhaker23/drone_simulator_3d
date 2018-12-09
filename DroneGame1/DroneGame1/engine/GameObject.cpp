@@ -20,7 +20,7 @@ map<int, string> GameObject::modelsLoaded = {};
 int GameObject::debugShader = -1;
 
 vector<string> GameObject::collisionsResolved;
-float GameObject::yAxisFloor = -30.0f;
+float GameObject::yAxisFloor = -60.0f;
 
 
 float* GameObject::getLightPosition() {
@@ -92,13 +92,19 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 	
 	if (physics->dynamic) {
 
-		this->localX += physics->forces[0];
-		this->localY += physics->forces[1];
-		this->localZ += physics->forces[2];
+		float xDelta = physics->forces[0] / (physics->mass*2.0f);
+		float yDelta = physics->forces[1] / (physics->mass*2.0f);
+		float zDelta = physics->forces[2] / (physics->mass*2.0f);
+		
+		this->localX += xDelta;
+		this->localY += yDelta;
+		this->localZ += zDelta;
+
+		physics->forces -= glm::vec3(xDelta, yDelta, zDelta);
 	}
 
 
-	if (!physics->ghost) {
+	if (!physics->ghost && physics->dynamic) {
 		vector<glm::vec3> forcesFromCollisions = getForcesFromCollisions(colliders);
 		physics->collisionForces += resolveForces(forcesFromCollisions);
 		if (physics->collisionForces.x != 0 || physics->collisionForces.y != 0 || physics->collisionForces.z != 0) {
@@ -111,16 +117,18 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 			*/
 			//physics->forces = overrideForce;
 
-			this->localX += physics->collisionForces[0] * 0.5f;
-			this->localY += physics->collisionForces[1] * 0.5f;
-			this->localZ += physics->collisionForces[2] * 0.5f;
-
+			/*
+			this->localX += ((physics->collisionForces[0] < 0.f) ? -1.f : 1.f) * std::sqrt(std::abs(physics->collisionForces[0]));
+			this->localY += ((physics->collisionForces[1] < 0.f) ? -1.f : 1.f) * std::sqrt(std::abs(physics->collisionForces[1]));
+			this->localZ += ((physics->collisionForces[2] < 0.f) ? -1.f : 1.f) * std::sqrt(std::abs(physics->collisionForces[2]));
+			*/
+			physics->forces += physics->collisionForces;
 		}
 	}
 
 
 	physics->oldForces = glm::vec3(physics->forces);
-	physics->forces = glm::vec3(0.f, 0.f, 0.f);
+	//physics->forces = glm::vec3(0.f, 0.f, 0.f);
 	physics->collisionForces = glm::vec3(0.f, 0.f, 0.f);
 }
 
@@ -145,12 +153,12 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 		glm::vec3 distVector = glm::vec3(a->worldX, a->worldY, a->worldZ) - glm::vec3(b->worldX, b->worldY, b->worldZ);
 		float distSqr = (distVector.x*distVector.x) + (distVector.y*distVector.y) + (distVector.z*distVector.z);
 
-		if (true || distSqr <= coverageSqr / 2.0f) {
+		if (distSqr <= coverageSqr) {
 
 			//Sphere only collisions
 			//hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
 
-			if (name == "Drone1" && b->name == "Tardis") {
+			//if (name == "Drone1" && b->name == "Tardis") {
 				if (a->oldMV != a->worldPositionMatrix || b->oldMV != b->worldPositionMatrix) {
 					
 					
@@ -189,7 +197,7 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 					}
 					/**/
 
-				}
+				//}
 			}
 		}
 	}
@@ -233,9 +241,11 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 					//glm::vec3 collisionForce = glm::vec3((hitPositions[0].x - otherWorld.x), (hitPositions[0].y - otherWorld.y), (hitPositions[0].z - otherWorld.z));
 					//glm::vec3 collisionForce = glm::vec3((myWorld.x - hitPositions[0].x), (myWorld.y - hitPositions[0].y), (myWorld.z - hitPositions[0].z));
 					if (collisionForce.x != 0.f || collisionForce.y != 0.f || collisionForce.z != 0.f) {
-						forceList.push_back(glm::normalize(collisionForce));
+						
+						forceList.push_back(glm::normalize(collisionForce)/2.0f);
 						//temporary way of applying force to other
 						other->physics->collisionForces -= glm::normalize(collisionForce)*0.5f;
+					
 					//if (hitPositions[0].x != 0.f || hitPositions[0].y != 0.f || hitPositions[0].z != 0.f) {
 						//forceList.push_back(glm::normalize(-hitPositions[0]));
 					}

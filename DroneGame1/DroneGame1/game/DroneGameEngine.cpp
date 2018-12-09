@@ -37,7 +37,7 @@ void DroneGameEngine::init() {
 	misc1->scale = 2.0f;
 	misc1->radius = 25.f;
 	misc1->physics = new Physics();
-	misc1->material->shininess = 0.5f;
+	misc1->material->shininess = 120.0f;
 	misc1->material->normalMapping = 1;
 
 
@@ -89,7 +89,8 @@ void DroneGameEngine::init() {
 	terrain_1->worldY = -50.f;
 	terrain_1->scale = 10.0f;
 	terrain_1->physics = new Physics();
-	//terrain_1->material->shadeless = 1;
+	terrain_1->material->normalMapping = 1;
+	terrain_1->material->shininess = 0.2f;
 
 	myScene->addObject(terrain_1);
 	
@@ -121,7 +122,7 @@ void DroneGameEngine::init() {
 	//GameObject* droneLamp = GameObject::makeLight(glm::vec3(0.f, 2.f, -1.f), glm::vec4(0.4f, 0.4f, 0.9f, 1.f), 10.0f);
 	//droneLamp->parent = drone;
 	//myScene->lights.push_back(drone);
-	drone->myLight = new Light(glm::vec4(0.4f, 0.9f, 0.5f, 1.f), 5.0f);
+	drone->myLight = new Light(glm::vec4(0.4f, 0.9f, 0.5f, 1.f), 8.0f);
 	myScene->lights.push_back(drone);
 
 	GameObject* sun = GameObject::makeLight(glm::vec3(0.f, 20.f, 0.f), glm::vec4(0.8f, 0.7f, 0.1f, 1.f), 15.0f);
@@ -277,7 +278,6 @@ void DroneGameEngine::processKeys()
 		secondObject->localX += worldX;
 		secondObject->localY += worldY;
 		secondObject->localZ += worldZ;
-
 
 		GameObject* clouds = current_scene->getGameObjects()[6];
 		clouds->spinYinc = 0.01f;
