@@ -60,6 +60,7 @@ void Scene::draw() {
 	if (activeCamera == -1 || (int)Cameras::cameras.size() <= activeCamera){
 		return;
 	}
+	Cameras::cameras[activeCamera]->updateCameraTransformation();
 	glm::mat4 cameraModelView = glm::inverse(Cameras::cameras[activeCamera]->modelViewMatrix);
 
 	for (int i = 0; i < (int)lights.size(); i++) {
@@ -73,7 +74,6 @@ void Scene::draw() {
 		
 	}
 
-	Cameras::cameras[activeCamera]->updateCameraTransformation();
 
 }
 

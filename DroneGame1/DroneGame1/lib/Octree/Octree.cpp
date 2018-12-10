@@ -508,7 +508,7 @@ void Octree::drawAllBoxes(Shader* myShader)
 	{
 		for(int i=0; i<8; i++)
 		{
-			if(children[i] != NULL)
+			if(children[i] != NULL && children[i]->VertexListSize > 0)
 				children[i]->drawAllBoxes(myShader);
 		}
 		drawBoundingBox(myShader);

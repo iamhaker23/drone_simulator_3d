@@ -31,6 +31,7 @@ Camera::Camera(GLfloat fov, GLfloat aspect, GLfloat nearPlane, GLfloat farPlane,
 	this->target = NULL;
 	this->up = glm::vec3(0.f, 1.f, 0.f);
 	this->parent = parent;
+
 }
 
 Camera::~Camera() {
@@ -73,7 +74,8 @@ void Camera::updateCameraTransformation() {
 		glm::vec3 targetPos = glm::vec3(target->modelViewMatrix[3][0], target->modelViewMatrix[3][1], target->modelViewMatrix[3][2]);
 		modelViewMatrix = glm::inverse(glm::lookAt(glm::vec3(modelViewMatrix[3][0], modelViewMatrix[3][1], modelViewMatrix[3][2]), targetPos, up));
 	}
-		
+			
+
 }
 
 void Camera::updateProjectionMatrix() {

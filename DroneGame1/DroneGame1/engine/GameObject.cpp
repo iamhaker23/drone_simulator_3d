@@ -114,19 +114,19 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 
 	if (physics->dynamic) {
 
-		float xDelta = physics->forces[0] / (physics->mass*2.0f);
-		float yDelta = physics->forces[1] / (physics->mass*2.0f);
-		float zDelta = physics->forces[2] / (physics->mass*2.0f);
+		float xDelta = physics->forces[0] / (physics->mass*10.0f);
+		float yDelta = physics->forces[1] / (physics->mass*10.0f);
+		float zDelta = physics->forces[2] / (physics->mass*10.0f);
 		
 		this->localX += xDelta;
 		this->localY += yDelta;
 		this->localZ += zDelta;
-
-		physics->forces -= glm::vec3(xDelta, yDelta, zDelta);
+		physics->oldForces = glm::vec3(xDelta, yDelta, zDelta);
+		physics->forces -= physics->oldForces;
 	}
 
 
-	physics->oldForces = glm::vec3(physics->forces);
+	//physics->oldForces = glm::vec3(physics->forces);
 	//physics->forces = glm::vec3(0.f, 0.f, 0.f);
 	physics->collisionForces = glm::vec3(0.f, 0.f, 0.f);
 }
@@ -484,7 +484,7 @@ void GameObject::updateTransformation() {
 	worldZ = modelViewMatrix[3][2];
 
 	//TODO: remove hack for drone when in hover mode
-	if (physics != NULL && (physics->gravity || name=="Drone1") && worldY <= GameObject::yAxisFloor+this->extent) worldY = GameObject::yAxisFloor + this->extent;
+	if (physics != NULL && (!physics->notMoveable) && worldY <= GameObject::yAxisFloor+this->extent) worldY = GameObject::yAxisFloor + this->extent;
 
 }
 
