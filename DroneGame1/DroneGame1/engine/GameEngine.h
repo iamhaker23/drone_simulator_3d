@@ -22,7 +22,7 @@ public:
 	virtual void processKeys() = 0;
 	virtual void draw() = 0;
 	virtual void init() = 0;
-	virtual void update() = 0;
+	virtual void update(bool doPhysics) = 0;
 	virtual void resize(int width, int height) = 0;
 	SceneManager* getSceneManager();
 	InputManager* getInputManager();

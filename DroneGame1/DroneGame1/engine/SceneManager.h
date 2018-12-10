@@ -19,7 +19,7 @@ public:
 	virtual void setScene(int scene);
 	virtual int addScene(Scene* scene, bool activate);
 	virtual void drawActive();
-	virtual void updateActive();
+	//virtual void updateActive();
 	virtual void resizeCameras(GLfloat width, GLfloat height);
 	Scene* getActiveScene();
 

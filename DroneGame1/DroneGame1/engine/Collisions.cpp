@@ -1,73 +1,116 @@
 #include "Collisions.h"
 
+glm::vec3 Collisions::doSAT(int collisionType, ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::mat4 MVb) {
+	
+	vector<Octree*> colliders = vector<Octree*>();
+	
+	bool goToMaxDepth = (collisionType == 2 || collisionType == 3);
 
-bool Collisions::doSAT(ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::mat4 MVb, bool chooser) {
-
-	vector<Octree*> colliders = doSAT(a->octree, b->octree, MVa, MVb);
-
-	return ((int)colliders.size() == 2);
-}
-
-glm::vec3 Collisions::doSAT(ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::mat4 MVb) {
-
-	glm::vec3 hitPoint = glm::vec3(0);
-
-	vector<Octree*> colliders = doSAT(a->octree, b->octree, MVa, MVb);
+	//Assumes root octree is the same as bounding box...
+	colliders = doSAT(goToMaxDepth, a->octree, b->octree, MVa, MVb);
 	
 	//cout << "COLLIDERS:" << (int)colliders.size() << endl;
 
 	if ((int)colliders.size() == 2) {
 		//cout << "COLLISION" << endl;
 
-		Octree* aOct = colliders[0];
-		Octree* bOct = colliders[1];
+		if (collisionType == 3) {
+			//compare triangles
 
-		glm::vec3 aLargestExtent = glm::vec3(aOct->box->verts[21], aOct->box->verts[22], aOct->box->verts[23]) - glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2]);
-		glm::vec3 bLargestExtent = glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]);
+			Octree* aOct = colliders[0];
+			Octree* bOct = colliders[1];
 
-		glm::mat4 aLargestExtentWorld = glm::translate(glm::mat4(1.f), aLargestExtent);
-		glm::mat4 bLargestExtentWorld = glm::translate(glm::mat4(1.f), bLargestExtent);
+			int aTris = aOct->PrimitiveListSize;
+			int bTris = bOct->PrimitiveListSize;
 
-		glm::mat4 hitPointM = bLargestExtentWorld + (aLargestExtentWorld - bLargestExtentWorld/2.f);
-		hitPoint = glm::vec3(hitPointM[3][0], hitPointM[3][1], hitPointM[3][2]);
-		//hitPoint = glm::vec3(1.0f, 1.0f, 1.0f);
-		return hitPoint;
+			cout << aOct->getLevel() << "_" << bOct->getLevel() << endl;
+			cout << aTris << " ::::" << bTris << endl;
+
+			glm::vec3 centreOfBOct = glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]) + ((glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2])) / 2.0f);
+
+			return centreOfBOct;
+
+
+		}
+		else {
+			
+			Octree* bOct = colliders[1];
+
+			glm::vec3 centreOfBOct = glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]) + ((glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2])) / 2.0f);
+
+			return centreOfBOct;
+		}
+
+		
 	}
 	else {
-		return hitPoint;
+		//TODO: remove this hack to represent no hit with a zero vector
+		cout << "NOHIT" << endl;
+		return glm::vec3(0);
 	}
 
 }
 
 
-vector<Octree*> Collisions::doSAT(Octree* a, Octree* b, glm::mat4 MVa, glm::mat4 MVb) {
+vector<Octree*> Collisions::doSAT(bool goToMaxDepth, Octree* a, Octree* b, glm::mat4 MVa, glm::mat4 MVb) {
 	
 	//int count = 0;
 
 	vector<Octree*> colliders = vector<Octree*>();
 
-	if (SAT(a->box, b->box, MVa, MVb)) {
+	if (a->VertexListSize > 0 && b->VertexListSize > 0 && SAT(a->box, b->box, MVa, MVb)) {
 
 		//cout << "HIT Level_" << a->getLevel() << " " << count << endl;
 
-		if (a->getLevel() != MAX_DEPTH) {
+		if (goToMaxDepth) cout << "Go To Max Depth" << endl;
+		if (goToMaxDepth && a->getLevel() != MAX_DEPTH) {
+			
+			vector<Octree*> aIntersects = vector<Octree*>();
+
+			//find lowest-level octrees which intersects with b
 			for (int aChild = 0; aChild < 8; aChild++) {
-				for (int bChild = 0; bChild < 8; bChild++) {
-					Octree* aChildOct = a->getChild(aChild);
-					Octree* bChildOct = b->getChild(bChild);
-					if (aChildOct != NULL && aChildOct->VertexListSize != 0 && bChildOct != NULL && bChildOct->VertexListSize != 0) {
+				Octree* aChildOct = a->getChild(aChild);
+				if (aChildOct != NULL && aChildOct->VertexListSize > 0) {
+					bool isAChildIntersecting = SAT(aChildOct->box, b->box, MVa, MVb);
+					if (isAChildIntersecting) {// && aIntersection[0]->getLevel() == MAX_DEPTH) {
+						aIntersects.push_back(aChildOct);
+					}
+				}
+			}
 
-						//cout << "A: " << aChild << " B:" << bChild << endl;
-						//count++;
+			vector<Octree*> bIntersects = vector<Octree*>();
 
-						colliders = doSAT(aChildOct, bChildOct, MVa, MVb);
-						if ((int)colliders.size() > 0) {
-							
-							return colliders;
+			//find lowest-level octrees which intersect with a
+			for (int bChild = 0; bChild < 8; bChild++) {
+				Octree* bChildOct = b->getChild(bChild);
+				if (bChildOct != NULL && bChildOct->VertexListSize > 0) {
+					bool isBChildIntersecting = SAT(bChildOct->box, b->box, MVa, MVb);
+					if (isBChildIntersecting) {// && bIntersection[1]->getLevel() == MAX_DEPTH) {
+						bIntersects.push_back(bChildOct);
+					}
+				}
+			}
+
+			if ((int)aIntersects.size() > 0 && (int)bIntersects.size() > 0) {
+
+				//cout << "A:" << (int)aIntersects.size() << " B:" << (int)bIntersects.size() << endl;
+				cout << "\tOctree Comparisons: " << aIntersects.size()*bIntersects.size() << endl;
+
+				for (int aIntersectIdx = 0; aIntersectIdx < (int)aIntersects.size(); aIntersectIdx++) {
+					for (int bIntersectIdx = 0; bIntersectIdx < (int)bIntersects.size(); bIntersectIdx++) {
+						if (SAT(aIntersects[aIntersectIdx]->box, bIntersects[bIntersectIdx]->box, MVa, MVb)) {
+							//colliders.push_back(aIntersects[aIntersectIdx]);
+							//colliders.push_back(bIntersects[bIntersectIdx]);
+							//return colliders;
+							return doSAT(goToMaxDepth, aIntersects[aIntersectIdx], bIntersects[bIntersectIdx], MVa, MVb);
 						}
 					}
 				}
 			}
+			else {
+				return colliders;
+			}
+
 		}
 		else {
 
@@ -101,6 +144,7 @@ bool Collisions::SAT(Box* a, Box* b, glm::mat4 MVa, glm::mat4 MVb) {
 		float bproj[2] = { 0, 0 };
 		projectBox(aproj, a, axis, MVa);
 		projectBox(bproj, b, axis, MVb);
+
 		if (!overlap(aproj, bproj)) {
 			//cout << "SEP ------- AXIS(" << i << ") (" << axis.x << "," << axis.y << "," << axis.z << ") : "  << aproj[0] << "-" << aproj[1] << "AND " << bproj[0] << "-" << bproj[1] << endl;
 			return false;

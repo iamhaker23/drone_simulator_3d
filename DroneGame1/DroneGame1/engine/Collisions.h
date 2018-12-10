@@ -20,10 +20,10 @@ class Collisions {
 public:
 #include "Collisions.h"
 
-	static bool doSAT(ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::mat4 MVb, bool chooser);
-	static glm::vec3 Collisions::doSAT(ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::mat4 MVb);
 	
-	static vector<Octree*> Collisions::doSAT(Octree* a, Octree* b, glm::mat4 MVa, glm::mat4 MVb);
+	static glm::vec3 Collisions::doSAT(int collisionType, ThreeDModel* a, ThreeDModel* b, glm::mat4 MVa, glm::mat4 MVb);
+	
+	static vector<Octree*> Collisions::doSAT(bool goToMaxDepth, Octree* a, Octree* b, glm::mat4 MVa, glm::mat4 MVb);
 	static bool Collisions::SAT(Box* a, Box* b, glm::mat4 MVa, glm::mat4 MVb);
 	
 	static bool Collisions::overlap(float a[], float b[]);

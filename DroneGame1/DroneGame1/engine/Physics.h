@@ -12,6 +12,7 @@
 class Physics {
 public:
 
+	
 	float mass;
 	float frictionCoefficient;
 	float collisionMargin;

@@ -36,6 +36,7 @@ private:
 	int shaderIdx;
 	int modelIdx;
 
+	static int GameObject::collisionType;
 	static float GameObject::yAxisFloor;
 	float extent = 0.f;
 
@@ -105,7 +106,7 @@ public:
 
 	void draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix);
 	void addForce(float x, float y, float z);
-	void doCollisionsAndApplyForces(vector<GameObject*> colliders);
+	void doCollisionsAndApplyForces(bool doPhysics, vector<GameObject*> colliders);
 	vector<glm::vec3> getHitPositions(GameObject* a, GameObject* b);
 
 };

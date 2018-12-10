@@ -30,6 +30,6 @@ public:
 
 	void draw();
 	void init();
-	void update();
+	void update(bool doPhysics);
 	void resize(int width, int height);
 };

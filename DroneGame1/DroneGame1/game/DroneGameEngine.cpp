@@ -25,8 +25,6 @@ void DroneGameEngine::init() {
 
 	GameObject* person = new GameObject("Person", "Assets/models/person/person.obj", "Assets/glslfiles/basicTransformations", true);
 	person->worldY = -20.f;
-	person->worldZ = -50.f;
-	person->worldX = 0.f;
 	//person->material->normalMapping = 1;
 	//person->radius = 5.0f;
 	person->physics = new Physics(1.0f, 1.0f, 0.1f, false, true, false);

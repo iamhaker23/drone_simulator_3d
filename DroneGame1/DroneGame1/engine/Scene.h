@@ -22,7 +22,7 @@ public:
 	std::string getName();
 	void resizeCameras(GLfloat width, GLfloat height);
 	void draw();
-	void update();
+	//void update();
 
 	int addCamera(Camera* cam, bool activate);
 	int addObject(GameObject* toAdd);
