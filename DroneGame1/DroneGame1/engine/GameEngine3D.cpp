@@ -73,10 +73,27 @@ void GameEngine3D::update(bool doPhysics)
 	GameObject::collisionsResolved.clear();
 
 	current_scene = scene_manager->getActiveScene();
-	vector<GameObject*> current_scene_objects = current_scene->getGameObjects();
-	for (int i = 0; i < (int)current_scene_objects.size(); i++) {
-		current_scene_objects[i]->doCollisionsAndApplyForces(doPhysics, current_scene_objects);
+	
+	//vector<GameObject*> current_scene_objects = current_scene->getGameObjects();
+	//for (int i = 0; i < (int)current_scene_objects.size(); i++) {
+
+	for (int x = 0; x < current_scene->grid->midpoint * 2; x++) {
+		for (int y = 0; y < current_scene->grid->midpoint * 2; y++) {
+			for (int z = 0; z < current_scene->grid->midpoint * 2; z++) {
+
+				vector<GameObject*> sector = current_scene->grid->grid[x][y][z];
+
+				//if ((int)sector.size() > 0) cout << "COLLISIONS IN SECTOR:" << x << "," << y << "," << z << endl;
+
+				for (int o = 0; o < (int)sector.size(); o++) {
+					sector[o]->doCollisionsAndApplyForces(doPhysics, sector);
+				}
+			}
+		}
 	}
+	//Grid* oldGrid = current_scene->grid;
+	current_scene->grid = new Grid(current_scene->grid->objects);
+	//delete oldGrid;
 
 }
 

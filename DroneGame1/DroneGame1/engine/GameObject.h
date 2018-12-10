@@ -41,6 +41,7 @@ private:
 	float extent = 0.f;
 
 public:
+	bool debugEnabled = true;
 	float slowParentFactor;
 	glm::mat4 worldPositionMatrix;
 	glm::mat4 modelViewMatrix;

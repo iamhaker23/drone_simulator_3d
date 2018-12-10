@@ -2,7 +2,8 @@
 
 Scene::Scene()
 {
-	objects = vector<GameObject*>();
+	//objects = vector<GameObject*>();
+	grid = new Grid();
 	lights = vector<GameObject*>();
 	Cameras::init();
 }
@@ -27,10 +28,11 @@ void Scene::setActiveCamera(int idx) {
 
 Scene::~Scene()
 {
-
+	/*
 	while (objects.size() > 0) {
 		objects.erase(objects.begin());
-	}
+	}*/
+
 	while (lights.size() > 0) {
 		lights.erase(lights.begin());
 	}
@@ -60,23 +62,29 @@ void Scene::draw() {
 		lights[i]->updateTransformation();
 	}
 
-	for (int i = 0; i < (int)objects.size(); i++) {
-		assignLights(objects[i]);
+	
+	for (int i = 0; i < (int)grid->objects.size(); i++) {
+		assignLights(grid->objects[i]);
 		
-		objects[i]->draw(Cameras::cameras[activeCamera]->projectionMatrix, cameraModelView);
+		grid->objects[i]->draw(Cameras::cameras[activeCamera]->projectionMatrix, cameraModelView);
 		
 	}
+	
 
 
 }
 
 int Scene::addObject(GameObject* toAdd) {
-	objects.push_back(toAdd);
-	return objects.size() - 1;
+	
+	//objects.push_back(toAdd);
+
+	grid->addObject(toAdd);
+
+	return (int)grid->objects.size() - 1;
 }
 
 vector<GameObject*> Scene::getGameObjects() {
-	return this->objects;
+	return this->grid->objects;
 }
 
 void Scene::nextCamera() {

@@ -19,7 +19,7 @@ map<int, string> GameObject::shadersLoaded = {};
 map<int, string> GameObject::modelsLoaded = {};
 int GameObject::debugShader = -1;
 
-int GameObject::collisionType = 1;
+int GameObject::collisionType = 2;
 vector<string> GameObject::collisionsResolved;
 float GameObject::yAxisFloor = -29.0f;
 
@@ -91,7 +91,7 @@ void GameObject::doCollisionsAndApplyForces(bool doPhysics, vector<GameObject*> 
 		this->worldY -= gravity;
 	}
 	
-	if (!physics->ghost && !physics->notMoveable && doPhysics) {
+	if (!physics->ghost && !physics->notMoveable && physics->collisions && doPhysics) {
 		vector<glm::vec3> forcesFromCollisions = getForcesFromCollisions(colliders);
 		physics->collisionForces += resolveForces(forcesFromCollisions);
 		if (physics->collisionForces.x != 0 || physics->collisionForces.y != 0 || physics->collisionForces.z != 0) {
@@ -151,9 +151,7 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 
 		Octree* aOct = GameObject::modelList[a->modelIdx]->octree;
 		Octree* bOct = GameObject::modelList[b->modelIdx]->octree;
-
-		
-
+			   
 		//glm::vec3 aLargestExtent = a->scale * glm::vec3(aOct->box->verts[21], aOct->box->verts[22], aOct->box->verts[23]) - glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2]);
 		//glm::vec3 bLargestExtent = b->scale *  glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]);
 		
@@ -163,9 +161,10 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 		float distSqr = (distVector.x*distVector.x) + (distVector.y*distVector.y) + (distVector.z*distVector.z);
 		float coverageSqr = ((a->scale * aModel->boundingBox.getLargestExtent())*((a->scale * aModel->boundingBox.getLargestExtent()))) + ((b->scale * bModel->boundingBox.getLargestExtent())*(b->scale * bModel->boundingBox.getLargestExtent()));
 
-		float sphereBias = (GameObject::collisionType == 0) ? 2.f : 2.f;
-		if (distSqr <= coverageSqr/sphereBias) {
-		//if (distSqr <= coverageSqr) {
+		//Collision detection
+		//cout << a->name << "---------->" << b->name << endl;
+
+		if (distSqr < (coverageSqr/2.0f)) {
 			if (GameObject::collisionType == 0) {
 				//sphere only collisions, and collision has been detected
 				
@@ -291,7 +290,7 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 					//glm::vec3 collisionForce = glm::vec3((myWorld.x - hitPositions[0].x), (myWorld.y - hitPositions[0].y), (myWorld.z - hitPositions[0].z));
 					
 					if (collisionForce.x != 0.f || collisionForce.y != 0.f || collisionForce.z != 0.f) {
-						cout << name << "COLLISION" << endl;
+						//cout << name << "COLLISION" << endl;
 						forceList.push_back(glm::normalize(collisionForce));
 						//temporary way of applying force to other
 						other->physics->collisionForces -= glm::normalize(collisionForce);
@@ -311,7 +310,7 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 
 void GameObject::debugDraw(float vertices[], int vertexCount, int tris[], int numOfTris, bool init) {
 		
-	if (GameObject::debugShader != -1) {
+	if (debugEnabled && GameObject::debugShader != -1) {
 		Shader* debugShaderHandle = GameObject::shaderList[GameObject::debugShader];
 		glUseProgram(debugShaderHandle->handle());  // use the shader
 		//glUniformMatrix4fv(glGetUniformLocation(debugShaderHandle->handle(), "ProjectionMatrix"), 1, GL_FALSE, &(projectionMatrix)[0][0]);

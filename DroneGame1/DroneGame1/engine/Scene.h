@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include "Cameras.h"
 #include "Light.h"
+#include "Grid.h"
 
 class Scene {
 private:
@@ -17,7 +18,8 @@ public:
 
 	vector<GameObject*> lights;
 	std::string scene_name;
-	vector<GameObject*> objects;
+	//vector<GameObject*> objects;
+	Grid* grid;
 
 	std::string getName();
 	void resizeCameras(GLfloat width, GLfloat height);

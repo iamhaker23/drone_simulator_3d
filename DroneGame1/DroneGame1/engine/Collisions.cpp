@@ -23,8 +23,8 @@ glm::vec3 Collisions::doSAT(int collisionType, ThreeDModel* a, ThreeDModel* b, g
 			int aTris = aOct->PrimitiveListSize;
 			int bTris = bOct->PrimitiveListSize;
 
-			cout << aOct->getLevel() << "_" << bOct->getLevel() << endl;
-			cout << aTris << " ::::" << bTris << endl;
+			//cout << aOct->getLevel() << "_" << bOct->getLevel() << endl;
+			//cout << aTris << " ::::" << bTris << endl;
 
 			glm::vec3 centreOfBOct = glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]) + ((glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2])) / 2.0f);
 
@@ -44,8 +44,7 @@ glm::vec3 Collisions::doSAT(int collisionType, ThreeDModel* a, ThreeDModel* b, g
 		
 	}
 	else {
-		//TODO: remove this hack to represent no hit with a zero vector
-		cout << "NOHIT" << endl;
+		//TODO: remove this hack which is representing no hit with a zero vector
 		return glm::vec3(0);
 	}
 
@@ -94,7 +93,7 @@ vector<Octree*> Collisions::doSAT(bool goToMaxDepth, Octree* a, Octree* b, glm::
 			if ((int)aIntersects.size() > 0 && (int)bIntersects.size() > 0) {
 
 				//cout << "A:" << (int)aIntersects.size() << " B:" << (int)bIntersects.size() << endl;
-				cout << "\tOctree Comparisons: " << aIntersects.size()*bIntersects.size() << endl;
+				cout << "LEVEL " << a->getLevel() << "\n\tOctree Comparisons: " << aIntersects.size()*bIntersects.size() << endl;
 
 				for (int aIntersectIdx = 0; aIntersectIdx < (int)aIntersects.size(); aIntersectIdx++) {
 					for (int bIntersectIdx = 0; bIntersectIdx < (int)bIntersects.size(); bIntersectIdx++) {

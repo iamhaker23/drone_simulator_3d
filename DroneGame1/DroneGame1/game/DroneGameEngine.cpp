@@ -37,6 +37,10 @@ void DroneGameEngine::init() {
 	GameObject* sky_stars = new GameObject("SkyStars", "Assets/models/sky/stars.obj", "Assets/glslfiles/basicTransformations", true);
 	GameObject* sky_col = new GameObject("SkyHorizon", "Assets/models/sky/sky.obj", "Assets/glslfiles/basicTransformations", true);
 
+	sky_clouds->debugEnabled = false;
+	sky_stars->debugEnabled = false;
+	sky_col->debugEnabled = false;
+
 	sky_clouds->scale = 2.0f;
 	sky_stars->scale = 2.0f;
 	sky_col->scale = 2.0f;
@@ -315,9 +319,9 @@ void DroneGameEngine::processKeys()
 
 
 
-		for (int go = 0; go < (int)current_scene->objects.size(); go++) {
-			current_scene->objects[go]->drawBounds = drawDebug;
-			current_scene->objects[go]->drawOctree = drawDebug;
+		for (int go = 0; go < (int)current_scene->grid->objects.size(); go++) {
+			current_scene->grid->objects[go]->drawBounds = drawDebug;
+			current_scene->grid->objects[go]->drawOctree = drawDebug;
 		}
 
 		GameObject* secondObject = current_scene->getGameObjects()[1];
