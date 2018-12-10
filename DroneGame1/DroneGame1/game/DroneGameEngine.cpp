@@ -63,13 +63,22 @@ void DroneGameEngine::init() {
 
 
 	GameObject* prop = new GameObject("Prop", "Assets/models/shack/shack.obj", "Assets/glslfiles/basicTransformations", true);
-	
+
 	prop->worldX = 85.f;
 	prop->worldY = -18.0f;
 	prop->scale = 4.0f;
 	prop->physics = new Physics();
 	prop->material->shininess = 120.0f;
-	prop->material->normalMapping = 1;
+
+	GameObject* prop2 = new GameObject("Prop2", "Assets/models/tv/tv.obj", "Assets/glslfiles/basicTransformations", true);
+	prop2->worldX = -50.f;
+	prop2->worldZ = 10.0f;
+	prop2->worldY = 18.0f;
+	prop2->physics = new Physics(1.0f, 1.0f, 0.1f, false, true, false);
+	prop2->material->shininess = 120.0f; 
+	prop2->myLight = new Light(glm::vec4(0.5f, 0.5f, 0.9f, 1.f), 12.0f);
+	prop2->myLight->selfLight = true;
+	myScene->lights.push_back(prop2);
 
 	//TODO: Indexed in update function, use member variables instead
 	myScene->addObject(drone);
@@ -81,8 +90,10 @@ void DroneGameEngine::init() {
 	//not used via index in update
 	myScene->addObject(sky_col);
 	myScene->addObject(prop);
+	myScene->addObject(prop2);
 	
 	generateHouses(myScene);
+	//generateSkyscrapers(myScene);
 	generateRocks(myScene);
 	generateTrees(myScene);
 	

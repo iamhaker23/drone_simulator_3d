@@ -15,30 +15,32 @@ glm::vec3 Collisions::doSAT(int collisionType, ThreeDModel* a, ThreeDModel* b, g
 		//cout << "COLLISION" << endl;
 
 		if (collisionType == 3) {
-			//compare triangles
-
-			Octree* aOct = colliders[0];
-			Octree* bOct = colliders[1];
-
-			int aTris = aOct->PrimitiveListSize;
-			int bTris = bOct->PrimitiveListSize;
-
+			
 			//cout << aOct->getLevel() << "_" << bOct->getLevel() << endl;
 			//cout << aTris << " ::::" << bTris << endl;
 
+			Octree* bOct = colliders[1];
 			glm::vec3 centreOfBOct = glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]) + ((glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2])) / 2.0f);
+			Octree* aOct = colliders[0];
+			glm::vec3 centreOfAOct = glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2]) + ((glm::vec3(aOct->box->verts[21], aOct->box->verts[22], aOct->box->verts[23]) - glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2])) / 2.0f);
 
-			return centreOfBOct;
+
+			//int aTris = aOct->PrimitiveListSize;
+			//int bTris = bOct->PrimitiveListSize;
+			//compare triangles
+
+			return centreOfBOct - centreOfAOct;
 
 
 		}
 		else {
 			
 			Octree* bOct = colliders[1];
-
 			glm::vec3 centreOfBOct = glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2]) + ((glm::vec3(bOct->box->verts[21], bOct->box->verts[22], bOct->box->verts[23]) - glm::vec3(bOct->box->verts[0], bOct->box->verts[1], bOct->box->verts[2])) / 2.0f);
+			Octree* aOct = colliders[0];
+			glm::vec3 centreOfAOct = glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2]) + ((glm::vec3(aOct->box->verts[21], aOct->box->verts[22], aOct->box->verts[23]) - glm::vec3(aOct->box->verts[0], aOct->box->verts[1], aOct->box->verts[2])) / 2.0f);
 
-			return centreOfBOct;
+			return centreOfBOct-centreOfAOct;
 		}
 
 		
@@ -50,18 +52,20 @@ glm::vec3 Collisions::doSAT(int collisionType, ThreeDModel* a, ThreeDModel* b, g
 
 }
 
-
 vector<Octree*> Collisions::doSAT(bool goToMaxDepth, Octree* a, Octree* b, glm::mat4 MVa, glm::mat4 MVb) {
+	return Collisions::doSAT(goToMaxDepth, a, b, MVa, MVb, false);
+}
+vector<Octree*> Collisions::doSAT(bool goToMaxDepth, Octree* a, Octree* b, glm::mat4 MVa, glm::mat4 MVb, bool overrideBoundingBoxSAT) {
 	
 	//int count = 0;
 
 	vector<Octree*> colliders = vector<Octree*>();
 
-	if (a->VertexListSize > 0 && b->VertexListSize > 0 && SAT(a->box, b->box, MVa, MVb)) {
+	if (a->VertexListSize > 0 && b->VertexListSize > 0 && (overrideBoundingBoxSAT || SAT(a->box, b->box, MVa, MVb))) {
 
 		//cout << "HIT Level_" << a->getLevel() << " " << count << endl;
 
-		if (goToMaxDepth) cout << "Go To Max Depth" << endl;
+		//if (goToMaxDepth) cout << "Go To Max Depth" << endl;
 		if (goToMaxDepth && a->getLevel() != MAX_DEPTH) {
 			
 			vector<Octree*> aIntersects = vector<Octree*>();
@@ -93,7 +97,7 @@ vector<Octree*> Collisions::doSAT(bool goToMaxDepth, Octree* a, Octree* b, glm::
 			if ((int)aIntersects.size() > 0 && (int)bIntersects.size() > 0) {
 
 				//cout << "A:" << (int)aIntersects.size() << " B:" << (int)bIntersects.size() << endl;
-				cout << "LEVEL " << a->getLevel() << "\n\tOctree Comparisons: " << aIntersects.size()*bIntersects.size() << endl;
+				//cout << "LEVEL " << a->getLevel() << "\n\tOctree Comparisons: " << aIntersects.size()*bIntersects.size() << endl;
 
 				for (int aIntersectIdx = 0; aIntersectIdx < (int)aIntersects.size(); aIntersectIdx++) {
 					for (int bIntersectIdx = 0; bIntersectIdx < (int)bIntersects.size(); bIntersectIdx++) {
@@ -101,7 +105,10 @@ vector<Octree*> Collisions::doSAT(bool goToMaxDepth, Octree* a, Octree* b, glm::
 							//colliders.push_back(aIntersects[aIntersectIdx]);
 							//colliders.push_back(bIntersects[bIntersectIdx]);
 							//return colliders;
-							return doSAT(goToMaxDepth, aIntersects[aIntersectIdx], bIntersects[bIntersectIdx], MVa, MVb);
+							vector<Octree*> possibleHit = doSAT(goToMaxDepth, aIntersects[aIntersectIdx], bIntersects[bIntersectIdx], MVa, MVb, true);
+							if ((int)possibleHit.size() > 0) {
+								return possibleHit;
+							}
 						}
 					}
 				}
@@ -128,8 +135,6 @@ vector<Octree*> Collisions::doSAT(bool goToMaxDepth, Octree* a, Octree* b, glm::
 }
 
 bool Collisions::SAT(Box* a, Box* b, glm::mat4 MVa, glm::mat4 MVb) {
-	
-	
 	
 	vector<glm::vec3> axes = getAxes(a, b, MVa, MVb);
 	//for each axis
@@ -164,13 +169,12 @@ bool Collisions::overlap(float a[], float b[]){
 
 void Collisions::projectBox(float minMax[], Box* a, glm::vec3 axis, glm::mat4 MVa) {
 
-
 	glm::mat4 point = MVa * glm::translate(glm::mat4(1.f), glm::vec3(a->verts[0], a->verts[1], a->verts[2]));
 	float min = glm::dot(axis, glm::vec3(point[3][0], point[3][1], point[3][2]));
 	float max = min;
 
 	for (int i = 3; i < NumberOfVertexCoords; i+=3) {
-
+		
 		glm::mat4 point = MVa * glm::translate(glm::mat4(1.f), glm::vec3(a->verts[i], a->verts[i+1], a->verts[i+2]));
 		float curr = glm::dot(axis, glm::vec3(point[3][0], point[3][1], point[3][2]));
 
@@ -192,16 +196,21 @@ vector<glm::vec3> Collisions::getAxes(Box* a, Box* b, glm::mat4 MVa, glm::mat4 M
 
 	glm::vec3 v1 = glm::vec3(a->verts[0], 0, 0);
 	glm::vec3 v2 = glm::vec3(a->verts[21], 0, 0);
-	glm::vec3 a0 = (v1 - v2);
+	glm::mat4 a0m = glm::translate(glm::mat4(1.f), (v1 - v2));
 
 	v1 = glm::vec3(0, a->verts[1], 0);
 	v2 = glm::vec3(0, a->verts[22], 0);
-	glm::vec3 a1 = (v1 - v2);
+	glm::mat4 a1m = glm::translate(glm::mat4(1.f), (v1 - v2));
 
 	v1 = glm::vec3(0, 0, a->verts[2]);
 	v2 = glm::vec3(0, 0, a->verts[23]);
-	glm::vec3 a2 = (v1 - v2);
+	glm::mat4 a2m = glm::translate(glm::mat4(1.f), (v1 - v2));
 
+	glm::vec3 a0 = glm::vec3(a0m[3][0], a0m[3][1], a0m[3][2]);
+	glm::vec3 a1 = glm::vec3(a1m[3][0], a1m[3][1], a1m[3][2]);
+	glm::vec3 a2 = glm::vec3(a2m[3][0], a2m[3][1], a2m[3][2]);
+
+	
 	v1 = glm::vec3(b->verts[0], 0, 0);
 	v2 = glm::vec3(b->verts[21], 0, 0);
 	glm::mat4 b0m = glm::translate(glm::mat4(1.f), (v1 - v2))*MVa;

@@ -19,7 +19,9 @@ map<int, string> GameObject::shadersLoaded = {};
 map<int, string> GameObject::modelsLoaded = {};
 int GameObject::debugShader = -1;
 
-int GameObject::collisionType = 2;
+//0 - sphere, 1 - box, 2 - octree, 3 - vertex
+int GameObject::collisionType = 1;
+
 vector<string> GameObject::collisionsResolved;
 float GameObject::yAxisFloor = -29.0f;
 
@@ -201,29 +203,23 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 					*/
 
 					//cout << "SAT:" << a->name << " to " << b->name << endl;
-					/*
-					glm::vec3 hitPoint = Collisions::doSAT(
-						GameObject::collisionType, 
-						aModel, 
-						bModel, 
-						glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), 
-						glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)));
-					*/	
-
-					glm::vec3 hitPoint = Collisions::doSAT(
-						GameObject::collisionType,
-						aModel,
-						bModel,
-						glm::scale(glm::translate(a->modelViewMatrix, a->physics->forces), glm::vec3(a->scale, a->scale, a->scale)),
-						glm::scale(glm::translate(b->modelViewMatrix, b->physics->forces), glm::vec3(b->scale, b->scale, b->scale)));
-						
-
-					//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix);
-					//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix);
+					
+					
+					//glm::vec3 hitPoint = Collisions::doSAT(GameObject::collisionType, aModel, bModel, glm::scale(glm::mat4(1.f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix);
+					//glm::vec3 hitPoint = Collisions::doSAT(GameObject::collisionType, aModel, bModel, a->modelViewMatrix, b->modelViewMatrix);
 
 					//if (Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.0f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.0f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix)) {
 					//if (Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)))) {
 					//if (Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix)) {
+					
+					glm::vec3 hitPoint = Collisions::doSAT(
+							GameObject::collisionType,
+							aModel,
+							bModel,
+							glm::scale(glm::translate(a->modelViewMatrix, a->physics->oldForces), glm::vec3(a->scale, a->scale, a->scale)),
+							glm::scale(glm::translate(b->modelViewMatrix, b->physics->oldForces), glm::vec3(b->scale, b->scale, b->scale)));
+					
+
 					if (hitPoint.x != 0.f || hitPoint.y != 0.f || hitPoint.z != 0.f) {
 
 						//hits.push_back(glm::vec3(a->worldX, a->worldY, a->worldZ));
