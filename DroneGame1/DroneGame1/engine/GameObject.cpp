@@ -20,7 +20,7 @@ map<int, string> GameObject::modelsLoaded = {};
 int GameObject::debugShader = -1;
 
 vector<string> GameObject::collisionsResolved;
-float GameObject::yAxisFloor = -60.0f;
+float GameObject::yAxisFloor = -29.0f;
 
 
 float* GameObject::getLightPosition() {
@@ -90,21 +90,7 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 		this->worldY -= gravity;
 	}
 	
-	if (physics->dynamic) {
-
-		float xDelta = physics->forces[0] / (physics->mass*2.0f);
-		float yDelta = physics->forces[1] / (physics->mass*2.0f);
-		float zDelta = physics->forces[2] / (physics->mass*2.0f);
-		
-		this->localX += xDelta;
-		this->localY += yDelta;
-		this->localZ += zDelta;
-
-		physics->forces -= glm::vec3(xDelta, yDelta, zDelta);
-	}
-
-
-	if (!physics->ghost && physics->dynamic) {
+	if (!physics->ghost && !physics->notMoveable) {
 		vector<glm::vec3> forcesFromCollisions = getForcesFromCollisions(colliders);
 		physics->collisionForces += resolveForces(forcesFromCollisions);
 		if (physics->collisionForces.x != 0 || physics->collisionForces.y != 0 || physics->collisionForces.z != 0) {
@@ -124,6 +110,19 @@ void GameObject::doCollisionsAndApplyForces(vector<GameObject*> colliders) {
 			*/
 			physics->forces += physics->collisionForces;
 		}
+	}
+
+	if (physics->dynamic) {
+
+		float xDelta = physics->forces[0] / (physics->mass*2.0f);
+		float yDelta = physics->forces[1] / (physics->mass*2.0f);
+		float zDelta = physics->forces[2] / (physics->mass*2.0f);
+		
+		this->localX += xDelta;
+		this->localY += yDelta;
+		this->localZ += zDelta;
+
+		physics->forces -= glm::vec3(xDelta, yDelta, zDelta);
 	}
 
 
@@ -177,9 +176,9 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 					*/
 					
 					
-					//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)));
+					glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)));
 					//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix);
-					glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix);
+					//glm::vec3 hitPoint = Collisions::doSAT(aModel, bModel, a->modelViewMatrix, b->modelViewMatrix);
 					
 					//if (Collisions::doSAT(aModel, bModel, glm::scale(glm::mat4(1.0f), glm::vec3(a->scale, a->scale, a->scale))*a->modelViewMatrix, glm::scale(glm::mat4(1.0f), glm::vec3(b->scale, b->scale, b->scale))*b->modelViewMatrix)) {
 					//if (Collisions::doSAT(aModel, bModel, glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)), glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)))) {
@@ -219,6 +218,7 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 
 			//quick check if the collision is already resolved
 			bool resolved = false;
+			/*
 			for (int collRes = 0; collRes < (int)GameObject::collisionsResolved.size(); collRes++) {
 				if (GameObject::collisionsResolved[collRes] == (other->name + name)) {
 					//cout << "COLLISION CULL" << GameObject::collisionsResolved[collRes]  << endl;
@@ -226,6 +226,7 @@ vector<glm::vec3> GameObject::getForcesFromCollisions(vector<GameObject*> collid
 					break;
 				}
 			}
+			*/
 			
 			if (!resolved) {
 
@@ -482,7 +483,8 @@ void GameObject::updateTransformation() {
 	worldY = modelViewMatrix[3][1];
 	worldZ = modelViewMatrix[3][2];
 
-	if (physics != NULL && physics->gravity && worldY <= GameObject::yAxisFloor+this->extent) worldY = GameObject::yAxisFloor + this->extent;
+	//TODO: remove hack for drone when in hover mode
+	if (physics != NULL && (physics->gravity || name=="Drone1") && worldY <= GameObject::yAxisFloor+this->extent) worldY = GameObject::yAxisFloor + this->extent;
 
 }
 

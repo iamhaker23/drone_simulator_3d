@@ -22,6 +22,7 @@ public:
 	glm::vec3 oldForces;
 	glm::vec3 collisionForces;
 	bool createsLift;
+	bool notMoveable;
 
 	inline Physics() {
 		this->forces = glm::vec3(0.f, 0.f, 0.f);
@@ -32,10 +33,13 @@ public:
 		this->dynamic = false;
 		this->gravity = false;
 		this->createsLift = false;
+		this->notMoveable = true;
 	}
 
 	inline Physics(float mass, float fric, float collMargin, bool ghost, bool dynamic, bool createsLift) {
 		
+		this->notMoveable = false;
+
 		this->forces = glm::vec3(0.f, 0.f, 0.f);
 		this->mass = mass;
 		this->frictionCoefficient = fric;
