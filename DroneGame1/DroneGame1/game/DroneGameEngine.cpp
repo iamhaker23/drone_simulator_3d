@@ -26,12 +26,23 @@ void DroneGameEngine::init() {
 	drone->material->normalMapping = 1;
 
 
-	GameObject* drone2 = new GameObject("Drone2", "Assets/models/truck/truck.obj", "Assets/glslfiles/basicTransformations", false);
-	drone2->scale = 0.5f;
+	GameObject* rotor1 = new GameObject("Rotor1", "Assets/models/rotor/rotor.obj", "Assets/glslfiles/basicTransformations", false);
+	rotor1->parent = drone;
+	rotor1->localY = -1.f;
+	rotor1->scale = 0.3f;
+	rotor1->inheritRotation = true;
+
+	GameObject* drone2 = new GameObject("Drone2", "Assets/models/shack/shack.obj", "Assets/glslfiles/basicTransformations", false);
+	drone2->scale = 0.3f;
 	drone2->physics = new Physics(2.0f, 1.0f, 0.5f, false, true, false);
 	drone2->physics->gravity = true;
 	drone2->radius = 1.0f;
 	drone2->material->normalMapping = 1;
+
+	GameObject* rotor2 = new GameObject("Rotor2", "Assets/models/rotor/rotor.obj", "Assets/glslfiles/basicTransformations", false);
+	rotor2->parent = drone2;
+	rotor2->localY = 0.8f;
+	rotor2->inheritRotation = true;
 
 	GameObject* person = new GameObject("Person", "Assets/models/person/person.obj", "Assets/glslfiles/basicTransformations", true);
 	person->worldY = -20.f;
@@ -97,6 +108,9 @@ void DroneGameEngine::init() {
 	myScene->addObject(sky_col);
 	myScene->addObject(water);
 	myScene->addObject(drone2);
+
+	myScene->addObject(rotor1);
+	myScene->addObject(rotor2);
 
 	//not used via index in update
 	myScene->addObject(prop);
@@ -346,13 +360,15 @@ void DroneGameEngine::processKeys()
 
 	if (current_scene != NULL) {
 		GameObject* firstObject = current_scene->getGameObjects()[0];
-		
+
 		firstObject->spinXinc = spinXinc * speed;
 		firstObject->spinYinc = spinYinc * speed;
 		firstObject->spinZinc = spinZinc * speed;
 
 
 		bool drawDebug = input_manager->isInputActivated(VK_F1);
+
+		bool deactivateAI = input_manager->isInputActivated(VK_F4);
 
 		if (input_manager->isInputActivated(VK_F2)) {
 			firstObject->physics->gravity = !firstObject->physics->gravity;
@@ -390,7 +406,7 @@ void DroneGameEngine::processKeys()
 		//clouds->material->uvOffset[1] = (clouds->material->uvOffset[1] + 0.0001f);
 
 		GameObject* skyCol = current_scene->getGameObjects()[4];
-		
+
 		skyCol->material->diffuse[3] = skyCol->material->diffuse[3] + (0.01f * skyColMultiplier);
 		//cout << skyCol->material->diffuse[3] << endl;
 		if (skyCol->material->diffuse[3] > 0.99f) skyColMultiplier = -1.f;
@@ -402,12 +418,24 @@ void DroneGameEngine::processKeys()
 
 		GameObject* droneai = current_scene->getGameObjects()[6];
 		//droneai->addForce(10.f, 10.f, 10.f);
+
+		if (!deactivateAI) {
+			droneai->addForce(
+				std::cosf(GameObject::time)
+				, (std::sinf(GameObject::time)) + 0.5f
+				, std::sinf(GameObject::time)
+			);
+		}
+
+		GameObject* rotor = current_scene->getGameObjects()[7];
 		
-		droneai->addForce(
-			std::cosf(GameObject::time)
-			,( std::sinf(GameObject::time)-0.5f) + 0.3f
-			,std::sinf(GameObject::time)
-		);
+		if (firstObject->worldY >= GameObject::yAxisFloor + (firstObject->extent / 2.f) + 0.05f) {
+			rotor->spinYinc += 20.f;
+		}
+		if (droneai->worldY >= GameObject::yAxisFloor + (droneai->extent / 2.f) + 0.05f) {
+			rotor = current_scene->getGameObjects()[8];
+			rotor->spinYinc += 20.f;
+		}
 
 		if (input_manager->isInputActivated(VK_NUMPAD0)) {
 			current_scene->nextCamera();

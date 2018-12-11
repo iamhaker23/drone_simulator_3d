@@ -493,11 +493,19 @@ glm::mat4 GameObject::getRotationMatrix(float xRot, float yRot, float zRot) {
 }
 
 void GameObject::updateTransformation() {
-		
+	
+	//hack for local rotation
+	bool doLocalRotation = false;
+	glm::mat4 localRotation = glm::mat4();
+
 	if (parent != NULL && inheritRotation) {
 		//TODO: slow parent rotations
 		//worldRotation *= getRotationMatrix(parent->spinXinc*-slowParentFactor, parent->spinYinc*-slowParentFactor, parent->spinZinc*-slowParentFactor);
+		//worldRotation = parent->worldRotation *  getRotationMatrix(spinXinc, spinYinc, spinZinc);
 		worldRotation = parent->worldRotation;
+		localRotation = getRotationMatrix(spinXinc, spinYinc, spinZinc);
+		doLocalRotation = true;
+
 	}
 	else {
 		//cumulative rotation
@@ -527,7 +535,12 @@ void GameObject::updateTransformation() {
 	worldPositionMatrix = (parent != NULL) ? parent->worldPositionMatrix : glm::translate(glm::mat4(1), glm::vec3(worldX, worldY, worldZ));
 
 	//apply rotation and translations to modelViewMatrix
-	modelViewMatrix = worldPositionMatrix * (worldRotation) * (localPosition);
+	if (doLocalRotation) {
+		modelViewMatrix = worldPositionMatrix * (worldRotation) * (localPosition) * localRotation;
+	}
+	else {
+		modelViewMatrix = worldPositionMatrix * (worldRotation) * (localPosition);
+	}
 
 	//update worldPosition (localtransform is accumulated into worldPosition modelViewMatrix)
 	worldX = modelViewMatrix[3][0];

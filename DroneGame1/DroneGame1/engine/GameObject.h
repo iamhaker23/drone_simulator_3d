@@ -37,10 +37,11 @@ private:
 	int modelIdx;
 
 	static int GameObject::collisionType;
-	static float GameObject::yAxisFloor;
-	float extent = 0.f;
 
 public:
+
+	float extent = 0.f;
+	static float GameObject::yAxisFloor;
 	static float GameObject::time;
 	bool debugEnabled = true;
 	float slowParentFactor;
