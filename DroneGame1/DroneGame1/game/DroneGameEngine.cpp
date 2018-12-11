@@ -25,6 +25,14 @@ void DroneGameEngine::init() {
 	drone->radius = 1.0f;
 	drone->material->normalMapping = 1;
 
+
+	GameObject* drone2 = new GameObject("Drone2", "Assets/models/truck/truck.obj", "Assets/glslfiles/basicTransformations", false);
+	drone2->scale = 0.5f;
+	drone2->physics = new Physics(2.0f, 1.0f, 0.5f, false, true, false);
+	drone2->physics->gravity = true;
+	drone2->radius = 1.0f;
+	drone2->material->normalMapping = 1;
+
 	GameObject* person = new GameObject("Person", "Assets/models/person/person.obj", "Assets/glslfiles/basicTransformations", true);
 	person->worldY = -20.f;
 	//person->material->normalMapping = 1;
@@ -64,8 +72,7 @@ void DroneGameEngine::init() {
 	sky_col->material->diffuse[3] = 0.2f;
 
 
-	GameObject* prop = new GameObject("Prop", "Assets/models/shack/shack.obj", "Assets/glslfiles/basicTransformations", true);
-
+	GameObject* prop = new GameObject("Prop", "Assets/models/truck/truck.obj", "Assets/glslfiles/basicTransformations", true);
 	prop->worldX = 85.f;
 	prop->worldY = -18.0f;
 	prop->scale = 4.0f;
@@ -89,6 +96,7 @@ void DroneGameEngine::init() {
 	myScene->addObject(sky_clouds);
 	myScene->addObject(sky_col);
 	myScene->addObject(water);
+	myScene->addObject(drone2);
 
 	//not used via index in update
 	myScene->addObject(prop);
@@ -99,9 +107,10 @@ void DroneGameEngine::init() {
 	generateRocks(myScene);
 	generateTrees(myScene);
 	
-	GameObject* terrain_1 = new GameObject("Terrain", "Assets/models/terrain_1.obj", "Assets/glslfiles/basicTransformations", true);
-	terrain_1->worldY = -150.f;
-	terrain_1->scale = 10.0f;
+
+	GameObject* terrain_1 = new GameObject("Terrain", "Assets/models/terrain/terrain.obj", "Assets/glslfiles/basicTransformations", true);
+	terrain_1->worldY = -62.5f;
+	terrain_1->scale = 20.0f;
 	//terrain_1->physics = new Physics();
 	terrain_1->material->normalMapping = 1;
 	terrain_1->material->shininess = 0.2f;
@@ -136,6 +145,8 @@ void DroneGameEngine::init() {
 
 
 	drone->myLight = new Light(glm::vec4(0.4f, 0.9f, 0.5f, 1.f), 8.0f);
+	//shiny drone
+	//drone->myLight->selfLight = true;
 	myScene->lights.push_back(drone);
 
 	GameObject* sun = GameObject::makeLight(glm::vec3(0.f, 20.f, 0.f), glm::vec4(0.8f, 0.7f, 0.1f, 1.f), 15.0f);
@@ -147,7 +158,7 @@ void DroneGameEngine::init() {
 	scene_manager->addScene(myScene, true);
 
 	input_manager->cooldown_config[VK_F2] = 40;
-	input_manager->cooldown_config[VK_NUMPAD0] = 100;
+	input_manager->cooldown_config[VK_NUMPAD0] = 40;
 
 }
 
@@ -157,6 +168,7 @@ void DroneGameEngine::generateHouses(Scene* myScene) {
 		GameObject* house = new GameObject("House", "Assets/models/house/house.obj", "Assets/glslfiles/basicTransformations", true);
 		house->worldX = -120.f+ (i*70.f);
 		house->worldZ = 100.f;
+		house->worldY = -5.0f;
 		house->scale = 10.f;
 		house->material->normalMapping = 1;
 		house->material->shininess = 0.2f;
@@ -359,7 +371,6 @@ void DroneGameEngine::processKeys()
 		firstObject->addForce(localX * moveSpeed, localY * moveSpeed, localZ * moveSpeed);
 
 
-
 		for (int go = 0; go < (int)current_scene->grid->objects.size(); go++) {
 			current_scene->grid->objects[go]->drawBounds = drawDebug;
 			current_scene->grid->objects[go]->drawOctree = drawDebug;
@@ -388,6 +399,15 @@ void DroneGameEngine::processKeys()
 		GameObject* water = current_scene->getGameObjects()[5];
 		water->material->uvOffset[0] = (water->material->uvOffset[0] + 0.0001f);
 		water->material->uvOffset[1] = (water->material->uvOffset[1] + 0.0001f);
+
+		GameObject* droneai = current_scene->getGameObjects()[6];
+		//droneai->addForce(10.f, 10.f, 10.f);
+		
+		droneai->addForce(
+			std::cosf(GameObject::time)
+			,( std::sinf(GameObject::time)-0.5f) + 0.3f
+			,std::sinf(GameObject::time)
+		);
 
 		if (input_manager->isInputActivated(VK_NUMPAD0)) {
 			current_scene->nextCamera();

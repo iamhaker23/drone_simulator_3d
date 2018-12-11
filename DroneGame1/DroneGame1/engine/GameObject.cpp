@@ -419,9 +419,11 @@ GameObject::GameObject(string name, string modelPath, string shaderPath, bool in
 	}
 
 	Octree* myOct = GameObject::modelList[modelIdx]->octree;
-	glm::vec3 myDiagonalExtent = (glm::vec3(myOct->box->verts[21], myOct->box->verts[22], myOct->box->verts[23]) - glm::vec3(myOct->box->verts[0], myOct->box->verts[1], myOct->box->verts[2]));
-	this->extent = glm::distance(myDiagonalExtent, glm::vec3(0));
+	//glm::vec3 myDiagonalExtent = (glm::vec3(myOct->box->verts[21], myOct->box->verts[22], myOct->box->verts[23]) - glm::vec3(myOct->box->verts[0], myOct->box->verts[1], myOct->box->verts[2]));
+	//this->extent = glm::distance(myDiagonalExtent, glm::vec3(0));
 
+	this->extent = GameObject::modelList[GameObject::modelIdx]->boundingBox.boxWidthY;
+	
 }
 
 int GameObject::loadShader(string shaderPath) {
@@ -532,9 +534,18 @@ void GameObject::updateTransformation() {
 	worldY = modelViewMatrix[3][1];
 	worldZ = modelViewMatrix[3][2];
 
-	//TODO: remove hack for drone when in hover mode
-	if (physics != NULL && (!physics->notMoveable) && worldY <= GameObject::yAxisFloor+this->extent) worldY = GameObject::yAxisFloor + this->extent;
-
+	if (physics != NULL && (!physics->notMoveable) && worldY <= GameObject::yAxisFloor+ (this->extent / 2.f)) worldY = GameObject::yAxisFloor + (this->extent/ 2.f);
+	/*
+	if (physics != NULL && (!physics->notMoveable) && worldY <= GameObject::yAxisFloor) {
+		//TODO: remove hack to account for person extent
+		if (name != "Person") {
+			worldY = GameObject::yAxisFloor + 4.0f;
+		}
+		else {
+			worldY = GameObject::yAxisFloor;
+		}
+	}
+	*/
 }
 
 
