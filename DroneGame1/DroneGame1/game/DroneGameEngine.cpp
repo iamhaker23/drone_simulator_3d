@@ -1,5 +1,7 @@
 #include "DroneGameEngine.h"
 
+float DroneGameEngine::skyColMultiplier = 1.f;
+
 DroneGameEngine::DroneGameEngine() : GameEngine3D() {
 
 	
@@ -29,7 +31,7 @@ void DroneGameEngine::init() {
 	//person->radius = 5.0f;
 	person->physics = new Physics(1.0f, 1.0f, 0.1f, false, true, false);
 		
-	GameObject* water = new GameObject("Water", "Assets/models/water/water.obj", "Assets/glslfiles/basicTransformations", true);
+	GameObject* water = new GameObject("Water", "Assets/models/water/water.obj", "Assets/glslfiles/water", true);
 	water->worldY = -60.0f;
 	water->scale = 10.0f;
 
@@ -46,9 +48,9 @@ void DroneGameEngine::init() {
 	sky_col->scale = 2.0f;
 
 	sky_clouds->material->shadeless = 1;
-	sky_clouds->material->diffuse[4] = 0.1f;
+	sky_clouds->material->diffuse[3] = 0.5f;
 	sky_stars->material->shadeless = 1;
-	sky_col->material->diffuse[4] = 0.1f;
+	sky_col->material->diffuse[3] = 0.1f;
 	sky_col->material->shadeless = 1;
 
 	sky_clouds->parent = drone;
@@ -85,15 +87,15 @@ void DroneGameEngine::init() {
 	myScene->addObject(person);
 	myScene->addObject(sky_stars);
 	myScene->addObject(sky_clouds);
+	myScene->addObject(sky_col);
 	myScene->addObject(water);
 
 	//not used via index in update
-	myScene->addObject(sky_col);
 	myScene->addObject(prop);
 	myScene->addObject(prop2);
 	
 	generateHouses(myScene);
-	//generateSkyscrapers(myScene);
+	generateSkyscrapers(myScene);
 	generateRocks(myScene);
 	generateTrees(myScene);
 	
@@ -195,6 +197,34 @@ void DroneGameEngine::generateTrees(Scene* myScene) {
 		tree->physics = new Physics();
 
 		myScene->addObject(tree);
+	}
+
+}
+void DroneGameEngine::generateSkyscrapers(Scene* myScene) {
+
+	for (int i = 0; i < 4; i++) {
+		GameObject* building = new GameObject("Skyscraper", "Assets/models/skyscraper/skyscraper.obj", "Assets/glslfiles/basicTransformations", true);
+		building->scale = 5.f;
+		building->worldZ = -150.f + (i * 80.f);
+		building->worldY = -15.f;
+		building->worldX = (i % 2 == 0) ? -200.f + (i * -20.0f) : 200.f + (i * 60.f);
+		//building->material->normalMapping = 1;
+		building->physics = new Physics();
+
+		myScene->addObject(building);
+	}
+
+	for (int i = 0; i < 4; i++) {
+		GameObject* building = new GameObject("Skyscraper2", "Assets/models/skyscraper2/skyscraper2.obj", "Assets/glslfiles/basicTransformations", true);
+		building->scale = 2.f;
+		building->worldX = -150.f + (i * 80.f);
+		building->worldY = -15.f;
+		building->worldZ = (i % 2 == 0) ? -200.f + (i * -20.0f) : 200.f + (i * 60.f);
+		//building->material->normalMapping = 1;
+		//tree->radius = 5.0f;
+		building->physics = new Physics();
+
+		myScene->addObject(building);
 	}
 
 }
@@ -342,12 +372,20 @@ void DroneGameEngine::processKeys()
 
 		GameObject* clouds = current_scene->getGameObjects()[2];
 		clouds->spinYinc = -0.02f;
+		clouds->material->uvOffset[0] = (clouds->material->uvOffset[0] - 0.0001f);
 		clouds = current_scene->getGameObjects()[3];
 		clouds->spinYinc = 0.01f;
-		clouds->material->uvOffset[1] = (clouds->material->uvOffset[0] + 0.001f);
+		clouds->material->uvOffset[1] = (clouds->material->uvOffset[1] + 0.0001f);
 		//clouds->material->uvOffset[1] = (clouds->material->uvOffset[1] + 0.0001f);
 
-		GameObject* water = current_scene->getGameObjects()[4];
+		GameObject* skyCol = current_scene->getGameObjects()[4];
+		
+		skyCol->material->diffuse[3] = skyCol->material->diffuse[3] + (0.01f * skyColMultiplier);
+		//cout << skyCol->material->diffuse[3] << endl;
+		if (skyCol->material->diffuse[3] > 0.99f) skyColMultiplier = -1.f;
+		else if (skyCol->material->diffuse[3] < 0.0f) skyColMultiplier = 1.f;
+
+		GameObject* water = current_scene->getGameObjects()[5];
 		water->material->uvOffset[0] = (water->material->uvOffset[0] + 0.0001f);
 		water->material->uvOffset[1] = (water->material->uvOffset[1] + 0.0001f);
 

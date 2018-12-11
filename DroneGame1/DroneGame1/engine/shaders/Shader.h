@@ -11,17 +11,7 @@ public:
 	Shader(void);
 	~Shader(void);
 
-private:
-	Shader(const Shader&);
-	Shader& operator=(const Shader&);
-
-private:
 	std::string m_name;
-	GLuint m_vertexShader;       //identifier for the vertex shader
-	GLuint m_fragmentShader;     //identifier for the fragment shader
-	GLuint m_programObject;      //identifier for the program- this is used when rendering.
-
-public:
 	//returns what we need for rendering
 	GLuint handle(void) const { return m_programObject; } 
 
@@ -32,4 +22,10 @@ private:
 	GLuint loadShader(const char* filename, const GLenum type) const;
 	std::string shaderInfoLog(const GLuint shader) const;
 	std::string programInfoLog(const GLuint program) const;
+	Shader(const Shader&);
+	//Shader& operator=(const Shader&);
+	GLuint m_vertexShader;       //identifier for the vertex shader
+	GLuint m_fragmentShader;     //identifier for the fragment shader
+	GLuint m_programObject;      //identifier for the program- this is used when rendering.
+
 };

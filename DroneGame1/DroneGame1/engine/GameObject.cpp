@@ -18,6 +18,7 @@ vector<ThreeDModel*> GameObject::modelList;
 map<int, string> GameObject::shadersLoaded = {};
 map<int, string> GameObject::modelsLoaded = {};
 int GameObject::debugShader = -1;
+float GameObject::time = 0.f;
 
 //0 - sphere, 1 - box, 2 - octree, 3 - vertex
 int GameObject::collisionType = 1;
@@ -593,7 +594,14 @@ void GameObject::draw(glm::mat4 projectionMatrix, glm::mat4 camViewMatrix) {
 	glUniform1f(glGetUniformLocation(shaderHandle->handle(), "alphaClip"), material->alphaClipThreshold);
 	glUniform2fv(glGetUniformLocation(shaderHandle->handle(), "uvOffset"), 1, material->uvOffset);
 
+	//TODO: more robust way of binding variables for shaders
+	if (shaderHandle->m_name == "Assets/glslfiles/water") {
+		glUniform1f(glGetUniformLocation(shaderHandle->handle(), "time"), GameObject::time);
+	}
+	
 	glUniform1i(glGetUniformLocation(shaderHandle->handle(), "shadeless"), material->shadeless);
+	
+	
 	glUniform1i(glGetUniformLocation(shaderHandle->handle(), "normalMapping"), material->normalMapping);
 
 	glUniform4fv(glGetUniformLocation(shaderHandle->handle(), "material_ambient"), 1, material->ambient);
@@ -680,8 +688,11 @@ int GameObject::doModelLoad(string modelPath, int shaderIdx) {
 			model->initVBO(shaderList[shaderIdx]);
 		}
 
-		//TODO: can free this data if not used
-		//model->deleteVertexFaceData();
+		//TODO: triangle collision detection (mode 3) is not accurate, 
+		//this line keeps necessary model data if you use (mode 3) regardless
+		if (GameObject::collisionType != 3) {
+			model->deleteVertexFaceData();
+		}
 
 		modelList.push_back(model);
 		GameObject::modelsLoaded.insert(pair<int, string>(modelList.size() - 1, modelPath));

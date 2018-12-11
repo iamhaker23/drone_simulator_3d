@@ -57,16 +57,16 @@ public:
 		//z -= midpoint;
 
 		//anything outside the grid will appear on the edges of the grid
-		if (x < -midpoint ) x = -midpoint ;
-		else if (x > midpoint ) x = midpoint ;
+		if (x <= -midpoint ) x = 1-midpoint ;
+		else if (x >= midpoint ) x = midpoint-1 ;
 
-		if (y < -midpoint ) y = -midpoint ;
-		else if (y > midpoint ) y = midpoint ;
+		if (y <= -midpoint ) y = 1-midpoint ;
+		else if (y >= midpoint ) y = midpoint-1 ;
 
-		if (z < -midpoint) z = -midpoint ;
-		else if (z > midpoint ) z = midpoint ;
+		if (z <= -midpoint) z = 1-midpoint ;
+		else if (z >= midpoint ) z = midpoint-1 ;
 
-
+		
 		//cout << "GRID:" << curr->name << "@" << x << "," << y << "," << z << endl;
 		grid[x + midpoint][y + midpoint][z + midpoint].push_back(curr);
 	}

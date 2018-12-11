@@ -65,11 +65,12 @@ void GameEngine3D::init()
 
 }
 
-void GameEngine3D::update(bool doPhysics)
+void GameEngine3D::update(bool doPhysics, float time)
 {
+
 	//TODO: WHY DOES THIS NOT WORK!?
 	//scene_manager->updateActive();
-
+	GameObject::time = time;
 	GameObject::collisionsResolved.clear();
 
 	current_scene = scene_manager->getActiveScene();

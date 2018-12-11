@@ -6,6 +6,9 @@ class DroneGameEngine : public GameEngine3D {
 
 
 public:
+
+	static float DroneGameEngine::skyColMultiplier;
+
 	DroneGameEngine();
 	void init();
 	void processKeys();
@@ -13,5 +16,6 @@ public:
 	void generateRocks(Scene* myScene);
 	void generateHouses(Scene* myScene);
 	void generateTrees(Scene* myScene);
+	void generateSkyscrapers(Scene* myScene);
 
 };
