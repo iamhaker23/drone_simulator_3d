@@ -216,9 +216,13 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 							GameObject::collisionType,
 							aModel,
 							bModel,
-							glm::scale(glm::translate(a->modelViewMatrix, a->physics->oldForces), glm::vec3(a->scale, a->scale, a->scale)),
-							glm::scale(glm::translate(b->modelViewMatrix, b->physics->oldForces), glm::vec3(b->scale, b->scale, b->scale)));
-					
+							//glm::scale(glm::translate(a->modelViewMatrix, a->physics->forces), glm::vec3(a->scale, a->scale, a->scale)),
+							//glm::scale(glm::translate(b->modelViewMatrix, b->physics->forces), glm::vec3(b->scale, b->scale, b->scale)));
+							glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)),
+							glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)),
+							a->scale,
+							b->scale
+						);
 
 					if (hitPoint.x != 0.f || hitPoint.y != 0.f || hitPoint.z != 0.f) {
 
@@ -676,7 +680,8 @@ int GameObject::doModelLoad(string modelPath, int shaderIdx) {
 			model->initVBO(shaderList[shaderIdx]);
 		}
 
-		model->deleteVertexFaceData();
+		//TODO: can free this data if not used
+		//model->deleteVertexFaceData();
 
 		modelList.push_back(model);
 		GameObject::modelsLoaded.insert(pair<int, string>(modelList.size() - 1, modelPath));

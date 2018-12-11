@@ -18,7 +18,6 @@ private:
 	double minX, minY, minZ, maxX, maxY, maxZ;
 	Octree* children[8];
 
-
 public:
 
 
