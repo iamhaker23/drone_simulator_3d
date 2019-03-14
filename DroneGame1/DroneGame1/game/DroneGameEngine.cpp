@@ -147,7 +147,7 @@ void DroneGameEngine::init() {
 	camera1->inheritRotation = true;
 	camera2->inheritRotation = true;
 
-	camera1->localZ = 2.5f;
+	camera1->localZ = 3.5f;
 	camera1->localY = 2.f;
 
 	camera2->localZ = 40.0f;
@@ -178,7 +178,7 @@ void DroneGameEngine::init() {
 
 void DroneGameEngine::generateHouses(Scene* myScene) {
 	
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 3; i++) {
 		GameObject* house = new GameObject("House", "Assets/models/house/house.obj", "Assets/glslfiles/basicTransformations", true);
 		house->worldX = -120.f+ (i*70.f);
 		house->worldZ = 100.f;
@@ -422,16 +422,31 @@ void DroneGameEngine::processKeys()
 		if (!deactivateAI) {
 			droneai->addForce(
 				std::cosf(GameObject::time)
-				, (std::sinf(GameObject::time)) + 0.5f
+				, (std::sinf(GameObject::time)) + 0.35f
 				, std::sinf(GameObject::time)
 			);
 		}
 
 		GameObject* rotor = current_scene->getGameObjects()[7];
 		
-		if (firstObject->worldY >= GameObject::yAxisFloor + (firstObject->extent / 2.f) + 0.05f) {
+		if ( (firstObject->worldY >= GameObject::yAxisFloor + (firstObject->extent / 2.f) + 0.05f)
+		|| (input_manager->isInputActivated(WKEY) ||
+			input_manager->isInputActivated(SKEY) ||
+			input_manager->isInputActivated(AKEY) ||
+			input_manager->isInputActivated(DKEY) ||
+			input_manager->isInputActivated(QKEY) ||
+			input_manager->isInputActivated(EKEY) ||
+			input_manager->isInputActivated(VK_UP) ||
+			input_manager->isInputActivated(VK_DOWN) ||
+			input_manager->isInputActivated(VK_LEFT) ||
+			input_manager->isInputActivated(VK_RIGHT) ||
+			input_manager->isInputActivated(VK_SHIFT) ||
+			input_manager->isInputActivated(VK_SPACE)
+			))
+		{
 			rotor->spinYinc += 20.f;
 		}
+
 		if (droneai->worldY >= GameObject::yAxisFloor + (droneai->extent / 2.f) + 0.05f) {
 			rotor = current_scene->getGameObjects()[8];
 			rotor->spinYinc += 20.f;

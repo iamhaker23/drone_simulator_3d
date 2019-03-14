@@ -1,0 +1,36 @@
+--------------------------------------------------------------------------------
+features
+--------------------------------------------------------------------------------
+
+OBB collision
+    -   started octree-to-octree and triangle but incomplete
+
+regular grid space
+
+mesh and shader reuse
+
+"bump" mapping
+4 lights + (objects as lights)
+uvscroll (skydome)
+water shader and contrast effect
+all models my own
+camera positions
+debug visuals
+NPC drone
+
+--------------------------------------------------------------------------------
+keyboard controls
+--------------------------------------------------------------------------------
+
+WASDQE ----> 6dom
+up/down/left/right/Lshift/Space ----> 6dor
+F1 ----> debug visuals
+F2 ----> hover mode
+F3 and +/- ----> camera FOV
+F4 ----> deactivate AI
+Numpad 0 -> camera switch
+
+-------------
+Blender for models
+CGTextures and own textures
+SSBump tool for normal maps

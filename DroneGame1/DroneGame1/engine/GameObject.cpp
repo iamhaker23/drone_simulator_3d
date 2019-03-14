@@ -167,7 +167,7 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 		//Collision detection
 		//cout << a->name << "---------->" << b->name << endl;
 
-		if (distSqr < (coverageSqr/2.0f)) {
+		if (distSqr < (coverageSqr/2.f)) {
 			if (GameObject::collisionType == 0) {
 				//sphere only collisions, and collision has been detected
 				
@@ -217,10 +217,10 @@ vector<glm::vec3> GameObject::getHitPositions(GameObject* a, GameObject* b) {
 							GameObject::collisionType,
 							aModel,
 							bModel,
-							//glm::scale(glm::translate(a->modelViewMatrix, a->physics->forces), glm::vec3(a->scale, a->scale, a->scale)),
-							//glm::scale(glm::translate(b->modelViewMatrix, b->physics->forces), glm::vec3(b->scale, b->scale, b->scale)));
-							glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)),
-							glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)),
+							glm::scale(glm::translate(a->modelViewMatrix, a->physics->forces), glm::vec3(a->scale, a->scale, a->scale)),
+							glm::scale(glm::translate(b->modelViewMatrix, b->physics->forces), glm::vec3(b->scale, b->scale, b->scale)),
+							//glm::scale(a->modelViewMatrix, glm::vec3(a->scale, a->scale, a->scale)),
+							//glm::scale(b->modelViewMatrix, glm::vec3(b->scale, b->scale, b->scale)),
 							a->scale,
 							b->scale
 						);
