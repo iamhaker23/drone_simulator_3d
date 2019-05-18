@@ -1,0 +1,13 @@
+# Blender MTL File: 'medres_dragon_2.blend'
+# Material Count: 2
+
+newmtl Material.001
+Ns 0.000000
+Ka 0.000000 0.000000 0.000000
+Kd 0.069712 0.011480 0.006087
+Ks 0.279245 0.138006 0.080233
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd dragon_diffuse.png
+map_Bump dragon_normal.png

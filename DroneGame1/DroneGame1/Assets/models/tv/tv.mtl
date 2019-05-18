@@ -1,0 +1,12 @@
+# Blender MTL File: 'tv.blend'
+# Material Count: 1
+
+newmtl CRT_TV
+Ns 3.921569
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.440133 0.440133 0.440133
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd SmashedTelevision.png
