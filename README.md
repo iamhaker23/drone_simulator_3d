@@ -39,7 +39,7 @@
 * Physics and collisions
 * UV scrolling, vertex displacement and bump mapping
 * 3D modelling and texturing
-** Assets made in Blender 3D
+* Assets made in Blender 3D
 
 ## Screenshots
 
