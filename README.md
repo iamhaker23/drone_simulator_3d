@@ -5,6 +5,8 @@
 * Debug view mode, AI drone, physics and collisions
 * Easily moddable using OBJ format, GLSL vert/frag shaders and image textures
 * Made with openGL 3.2 and C++11
+* University assignment for Graphics II course
+* This program is provided only as a demonstration of my software development experience
 
 ## Setup
 
