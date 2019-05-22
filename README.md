@@ -18,8 +18,8 @@
 * See my technical report <a href="https://github.com/iamhaker23/portfolio/blob/master/drone_simulation_3d/graphics_2_technical_report_WORDPRESS.pdf" target="_blank">here</a>.
 
 * Keyboard controls:
-|Action                         |Key(s)                     |
-|-------------------------------|---------------------------|
+| Action                        | Key(s)                    |
+| ----------------------------- | ------------------------- |
 | Movement                      | WASD + QE                 |
 | Rotation                      | Arrows + LSHIFT + SPACE   |
 | Debug view                    | F1                        |
