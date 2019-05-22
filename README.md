@@ -18,16 +18,17 @@
 * See my technical report <a href="https://github.com/iamhaker23/portfolio/blob/master/drone_simulation_3d/graphics_2_technical_report_WORDPRESS.pdf" target="_blank">here</a>.
 
 * Keyboard controls:
-| Action                        | Key(s)                    |
-| ----------------------------- | ------------------------- |
-| Movement                      | WASD + QE                 |
-| Rotation                      | Arrows + LSHIFT + SPACE   |
-| Debug view                    | F1                        |
-| Hover mode (toggle)           | F2                        |
-| Manual field-of-view (hold)   | F3                        |
-| stop AI drone (hold)          | F4                        |
-| FoV increase/decrease         | +/-                       | 
-| Toggle camera                 | Numpad 0                  |
+
+| Action | Key(s) |
+| --- | --- |
+| Movement | WASD + QE |
+| Rotation | Arrows + LSHIFT + SPACE |
+| Debug view | F1 |
+| Hover mode (toggle) | F2 |
+| Manual field-of-view (hold) | F3 |
+| stop AI drone (hold) | F4 |
+| FoV increase/decrease | +/- | 
+| Toggle camera | Numpad 0 |
 
 ## Demonstrates
 
